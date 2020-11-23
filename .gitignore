@@ -1,6 +1,16 @@
 # Big lib-folder
 lib
 
+# Useless files
+files/*.pdf
+files/*.png
+
+# .vscode-folder
+.vscode
+
+# Compiled binary file
+bin/*
+
 # Prerequisites
 *.d
 
