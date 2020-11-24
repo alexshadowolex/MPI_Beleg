@@ -1,19 +1,26 @@
 #!/bin/bash
 
 #Check for args
-picture1=""
-picture2=""
+command_line_args=""
 if [ -z "$1" ]
 then
     echo "Using default test pictures"
-    picture1="files/test_pictures/paint1.jpg"
-    picture2="files/test_pictures/paint2.jpg"
+    command_line_args="files/test_pictures/paint1.jpg files/test_pictures/paint2.jpg"
 else
-    picture1="$1"
-    picture2="$2"
+    for arg; do
+        command_line_args="${command_line_args} $arg"
+    done
 fi
 
 #Run the program
 echo "Run program"
-./bin/main $picture1 $picture2
-echo "Finished running program"
+./bin/main $command_line_args
+ret=$?
+extra_message=""
+if [ $ret != 0 ]
+then
+    extra_message="with failure"
+else
+    extra_message="with success"
+fi
+echo "Finished running program $extra_message"
