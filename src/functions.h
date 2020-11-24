@@ -6,9 +6,9 @@ typedef struct sFile_data{
     int width;
 }tFile_data;
 
-tFile_data read_picture(char * file_name);
+tFile_data * read_picture(char * file_name);
 
-long calculate_SAD(tFile_data data_ref_picture, tFile_data data_other_picture);
+float calculate_SAD(tFile_data * data_ref_picture, tFile_data * data_other_picture);
 
 #ifdef DEBUG
 #define xprintf(x) printf x

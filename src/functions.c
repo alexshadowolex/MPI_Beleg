@@ -73,7 +73,7 @@ void processEvent(Display *display, Window window, XImage *ximage, int width, in
 
 
 
-tFile_data read_picture(char * file_name){
+tFile_data * read_picture(char * file_name){
 
 #ifdef X11_DISPLAY
     XImage *ximage;
@@ -87,10 +87,9 @@ tFile_data read_picture(char * file_name){
     int tmp_height, tmp_width;
     int n;
     unsigned char * data;
-    tFile_data tmp;
-    xprintf(("%s\n", file_name));
+    tFile_data * tmp;
     result = stbi_info(file_name, &w2, &h2, &n2);
-    xprintf(("stb_info(%s, &w2, &h2, &n2) --> w2:%d, h2:%d, n2:%d\n", file_name, w2, h2, n2));
+    // xprintf(("stb_info(%s, &w2, &h2, &n2) --> w2:%d, h2:%d, n2:%d\n", file_name, w2, h2, n2));
 
     data = stbi_load(file_name, &width, &height, &n, 4); 
     if (data){ 
@@ -121,7 +120,7 @@ tFile_data read_picture(char * file_name){
         */
         stbi_write_jpg(stb_sprintf("output/%s_copy.jpg", fname), width, height, 4, data, 100);
 
-        printf("File output for %s completed\n", file_name);
+        xprintf(("File output for %s completed\n", file_name));
 
         for (tmp_height = 0; tmp_height < height; tmp_height++ ){
             for (tmp_width = 0; tmp_width < width; tmp_width++){
@@ -157,11 +156,14 @@ tFile_data read_picture(char * file_name){
         }  
 
 #endif
-        tmp.file_name = file_name;
-        tmp.data = data;
-        tmp.height = height; 
-        tmp.width = width;
-        free(data);	    
+        int size_tmp = sizeof(file_name) + sizeof(data) + (sizeof(height) / sizeof(int)) + (sizeof(width) / sizeof(int));
+        xprintf(("Size tmp: %i\n", size_tmp));
+        tmp = malloc(size_tmp);
+        tmp->file_name = file_name;
+        tmp->data = data;
+        tmp->height = height; 
+        tmp->width = width;
+        // free(data);	    
 
     } else {
         printf("Failed loading data on second try, picture %s\n", file_name);
@@ -171,9 +173,14 @@ tFile_data read_picture(char * file_name){
 
 //===================SAD Functions===================
 
-long calculate_SAD(tFile_data data_ref_picture, tFile_data data_other_picture){
-    long SAD = 0;
+float calculate_SAD(tFile_data * data_ref_picture, tFile_data * data_other_picture){
+    float SAD = 0;
     int i, j, k;
     //TODO Things dont work :(
+    for(i = 0; i < data_ref_picture->width; i++){
+        for(j = 0; j < data_ref_picture->height; j++){
+            SAD = SAD + abs(data_other_picture->data[i * data_ref_picture->width * 4 + i * 4] - data_ref_picture->data[i * data_ref_picture->width * 4 + i * 4]);
+        }
+    }
     return SAD;
 }
