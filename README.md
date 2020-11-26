@@ -6,10 +6,10 @@ Before running the program, make sure the lib-folder exists with the fitting fil
 
 ## Compile
 Compile with<br>
-gcc -omain src/main.c src/functions.c -lm; mv main bin<br>
+gcc -omain src/main.c src/list.c src/functions.c -lm; mv main bin<br>
 or run ./compile.sh<br>
 For Debug, compile with<br>
-gcc -omain src/main.c src/functions.c -lm -DDEBUG; mv main bin<br>
+gcc -omain src/main.c src/list.c src/functions.c -lm -DDEBUG; mv main bin<br>
 or run ./compile.sh DEBUG<br>
 
 ## Run

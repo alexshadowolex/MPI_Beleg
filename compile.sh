@@ -14,7 +14,7 @@ then
     tmp="with Debug option"
 fi
 
-gcc -omain src/main.c src/functions.c -lm $DEBUG
+gcc -omain src/main.c src/list.c src/functions.c -lm $DEBUG
 
 #Move binaries to bin-folder
 mv main bin
