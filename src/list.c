@@ -27,7 +27,7 @@ tList_Element * get_element(tList * list, int index){
     return element_at_index;
 }
 
-void append_element(tList * list, tFile_data * new_item){
+void append_element(tList * list, void * new_item){
     tList_Element * element = malloc(sizeof(tList_Element));
     element->item = new_item;
     element->next_element = NULL;

@@ -175,11 +175,14 @@ tFile_data * read_picture(char * file_name){
 
 float calculate_SAD(tFile_data * data_ref_picture, tFile_data * data_other_picture){
     float SAD = 0;
-    int i, j, k;
+    int i, j;
+    xprintf(("%s\n%s\n", data_ref_picture->data, data_other_picture->data));
     //TODO Things dont work :(
     for(i = 0; i < data_ref_picture->width; i++){
         for(j = 0; j < data_ref_picture->height; j++){
-            SAD = SAD + abs(data_other_picture->data[i * data_ref_picture->width * 4 + i * 4] - data_ref_picture->data[i * data_ref_picture->width * 4 + i * 4]);
+            int access_index = i * data_ref_picture->width * 4 + j * 4;
+            xprintf(("Accessing element at index %i\n", access_index));
+            SAD = SAD + abs(data_other_picture->data[access_index] - data_ref_picture->data[access_index]);
         }
     }
     return SAD;
