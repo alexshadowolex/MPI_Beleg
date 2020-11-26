@@ -2,10 +2,10 @@
 
 #Check for args
 command_line_args=""
-if [ -z "$1" ]
+if [ -z "$2" ]
 then
     echo "Using default test pictures"
-    command_line_args="files/test_pictures/paint1.jpg files/test_pictures/paint2.jpg"
+    command_line_args="$1 files/test_pictures/paint1.jpg files/test_pictures/paint2.jpg"
 else
     for arg; do
         command_line_args="${command_line_args} $arg"

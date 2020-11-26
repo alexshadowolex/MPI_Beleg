@@ -14,7 +14,14 @@ or run ./compile.sh DEBUG<br>
 
 ## Run
 Run with<br>
-./bin/main \<picture1> \<picture2><br>
+./bin/main \<distanze_motion_vector_seatch> \<picture1> \<picture2><br>
 Run with test-files<br>
-./bin/main files/test_pictures/paint1.jpg files/test_pictures/paint2.jpg<br>
-or use ./run.sh \<picture1> \<picture2> (giving no args uses the test pictures)
+./bin/main 5 files/test_pictures/paint1.jpg files/test_pictures/paint2.jpg<br>
+or use ./run.sh \<distanze_motion_vector_seatch> \<picture1> \<picture2> (giving no args uses the test pictures)
+
+
+## Command line args
+* arg 1: Defines the distance around each macro-block, in which the possible motion vector could be. Note that it will take more time, the bigger the number is. Only give int-values!
+* arg 2: Defines the references picture, which will be compared to all other pictures.
+* arg 3: Defines the first picture, which will be compared to the reference picture given with arg 2.
+* arg 4-...: Defines more pictures to compare, which are optional. Note that it will take longer time to execute with more pictures given.
