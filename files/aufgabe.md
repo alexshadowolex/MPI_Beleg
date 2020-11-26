@@ -33,7 +33,7 @@ Programmiersprachen: C, C++, MPI, (wahlweise MPI-Threads), stb-lib (zum lesen vo
   -> XMING
 * Wie suche nach ähnlichem Bildbereich stattfindet? BSP: Gesicht um 5 px nach rechts und 3 nach unten verschoben: wie finden? Bereich darum zu erst (nahe verschiebungsvektoren)
 * Testdaten: zwei leicht unterschiedliche bilder mit paint (32x32) erstellen
-* Helligkeitswert aus rot, grün, blau und damit differenz bilden
+* Helligkeitswert aus rot, grün, blau und damit differenz bilden: Y = 0.30 * R + 0.59 * G + 0.11 * B
 * current min sad merken
 * alle neuen sads, die größer sind, aus der auswahl entfernen
 * bereich um makroblock zum suchen -> wert einfach per command line festlegen
