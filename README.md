@@ -2,22 +2,41 @@
 Project for my parallel systems module
 
 ## Info
-Before running the program, make sure the lib-folder exists with the fitting files (folder is **NOT** included in the repository).
+Before running the program, make sure the lib-folder exists with the fitting files (folder is **NOT** included in the repository). 
+<br><br>
 
 ## Compile
 Compile with<br>
-gcc -omain src/main.c src/list.c src/functions.c -lm; mv main bin<br>
-or run ./compile.sh<br>
+```
+gcc -omain src/main.c src/list.c src/functions.c -lm; mv main bin
+```
+or run <br>
+```
+./compile.sh
+```
 For Debug, compile with<br>
-gcc -omain src/main.c src/list.c src/functions.c -lm -DDEBUG; mv main bin<br>
-or run ./compile.sh DEBUG<br>
+```
+gcc -omain src/main.c src/list.c src/functions.c -lm -DDEBUG; mv main bin
+```
+or run <br>
+```
+./compile.sh DEBUG
+```
+<br><br>
 
 ## Run
 Run with<br>
-./bin/main \<distanze_motion_vector_seatch> \<picture1> \<picture2><br>
+```
+./bin/main <distanze_motion_vector_seatch> <picture1> <picture2>
+```
 Run with test-files<br>
-./bin/main 5 files/test_pictures/paint1.jpg files/test_pictures/paint2.jpg<br>
-or use ./run.sh \<distanze_motion_vector_seatch> \<picture1> \<picture2> (giving no args uses the test pictures)
+```
+./bin/main 5 files/test_pictures/paint1.jpg files/test_pictures/paint2.jpg
+```
+or use (giving no picture args uses the test pictures)<br>
+```
+./run.sh <distanze_motion_vector_seatch> <picture1> <picture2>
+```
 
 
 ## Command line args
