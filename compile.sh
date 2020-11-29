@@ -1,5 +1,5 @@
 #!/bin/sh
-#Compile the source
+#Write debug String, if given with $1
 DEBUG=""
 if [ ! -z "$1" ]
 then
@@ -7,13 +7,14 @@ then
 fi
 
 
-#Success
+#Modify output String, when Debug options are enabled
 tmp=""
 if [ ! -z $DEBUG ]
 then
     tmp="with Debug option"
 fi
 
+#Compile the source
 gcc -omain src/main.c src/list.c src/functions.c -lm $DEBUG
 
 #Move binaries to bin-folder
