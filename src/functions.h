@@ -6,8 +6,14 @@ typedef struct sFile_data{
     int width;
 }tFile_data;
 
-tFile_data * read_picture(char * file_name);
+typedef struct sPixel_data{
+    int red;
+    int green;
+    int blue;
+}tPixel_data;
 
+tFile_data * read_picture(char * file_name);
+tPixel_data access_file_data_array(tFile_data * file, int width, int height);
 float calculate_SAD(tFile_data * data_ref_picture, tFile_data * data_other_picture);
 
 #ifdef DEBUG

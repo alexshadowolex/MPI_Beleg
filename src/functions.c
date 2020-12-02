@@ -130,10 +130,11 @@ tFile_data * read_picture(char * file_name){
                 green = data[tmp_height * width * 4 + tmp_width * 4 + 1];
                 blue =  data[tmp_height * width * 4 + tmp_width * 4 + 2];
 
-                // xprintf(("Data: %c\n", data[tmp_height * width * 4 + tmp_width * 4]));
-                xprintf(("pixel %03d,%03d:  rgb: %03d,%03d,%03d \n", tmp_height, tmp_width, (int) red, (int) green, (int) blue));
+                // xprintf(("Index: %i\n", (tmp_height * width * 4 + tmp_width * 4 + 2)));
+                // xprintf(("pixel %03d,%03d:  rgb: %03d,%03d,%03d \n", tmp_height, tmp_width, (int) red, (int) green, (int) blue));
             }
-        }         
+        }    
+        // xprintf(("Last index: %i\n", ((height - 1) * width * 4 + (width - 1) * 4 + 2))); 
 
         xprintf(("Terminal output for %s completed\n", file_name));
 
@@ -156,11 +157,10 @@ tFile_data * read_picture(char * file_name){
         }  
 
 #endif
-        int size_tmp = sizeof(file_name) + sizeof(data) + (sizeof(height) / sizeof(int)) + (sizeof(width) / sizeof(int));
-        xprintf(("Size tmp: %i\n", size_tmp));
-        tmp = malloc(size_tmp);
+        tmp = malloc(sizeof(tFile_data));
         tmp->file_name = file_name;
-        tmp->data = data;
+        tmp->data = (char *) malloc((height - 1) * width * 4 + (width - 1) * 4 + 2);
+        memcpy(tmp->data, data, (height - 1) * width * 4 + (width - 1) * 4 + 2);
         tmp->height = height; 
         tmp->width = width;
         // free(data);	    
@@ -171,19 +171,46 @@ tFile_data * read_picture(char * file_name){
     return tmp;
 }
 
-//===================SAD Functions===================
+tPixel_data access_file_data_array(tFile_data * file, int x_width, int y_height){
+    int access_index = y_height * file->width * 4 + x_width * 4;
+    // xprintf(("access_index = %i\n", access_index));
+    unsigned char red_char = file->data[access_index + 0];
+    unsigned char green_char = file->data[access_index + 1];
+    unsigned char blue_char = file->data[access_index + 2];
+    int red = (int) red_char;
+    int green = (int) green_char;
+    int blue = (int) blue_char;
+    if(y_height >= file->height || x_width >= file->width){
+        red = -1;
+        green = -1;
+        blue = -1;
+    }
 
+    tPixel_data ret_value = {
+        red,
+        green,
+        blue
+    };
+    return ret_value;
+}
+
+//===================SAD Functions===================
+//Für jeden makroblock beim Testen des passenden verschiebungsvektor den jeweiligen sad-werte zu dem vektor speichern (struct?)
+//und nach beendigung alle werte vergleichen und den kleinsten nehmen und in eine liste speichern
+//Funktion kann frühzeitig beendt werden, wenn der Wert 0 gefunden wurde oder ein wert über dem aktuellen minimum liegt.
+//Schreiben einer funktion, die den indizierten zugriff auf die pixelwerte in passenden array-indize umwandelt
 float calculate_SAD(tFile_data * data_ref_picture, tFile_data * data_other_picture){
     float SAD = 0;
-    int i, j;
-    xprintf(("%s\n%s\n", data_ref_picture->data, data_other_picture->data));
     //TODO Things dont work :(
-    for(i = 0; i < data_ref_picture->width; i++){
-        for(j = 0; j < data_ref_picture->height; j++){
-            int access_index = i * data_ref_picture->width * 4 + j * 4;
-            xprintf(("Accessing element at index %i\n", access_index));
-            SAD = SAD + abs(data_other_picture->data[access_index] - data_ref_picture->data[access_index]);
-        }
-    }
+    //Make a better function
+    // int i, j;
+    // xprintf(("%s\n%s\n", data_ref_picture->data, data_other_picture->data));
+    // for(i = 0; i < data_ref_picture->width; i++){
+    //     for(j = 0; j < data_ref_picture->height; j++){
+    //         int access_index = i * data_ref_picture->width * 4 + j * 4;
+    //         xprintf(("Accessing element at index %i\n", access_index));
+    //         SAD = SAD + abs(data_other_picture->data[access_index] - data_ref_picture->data[access_index]);
+    //     }
+    // }
     return SAD;
 }

@@ -39,5 +39,19 @@ int main(int argc, char ** argv){
                                                       ((float *) get_element(SAD_values_list, i)->item)
         ));
     }
+    tPixel_data tmp;
+    tmp = access_file_data_array(((tFile_data *) get_element(file_data_list, 0)->item), 0, 0);
+    xprintf(("Returned: %i, %i, %i\n", tmp.red, tmp.green, tmp.blue));
+    tmp = access_file_data_array(((tFile_data *) get_element(file_data_list, 0)->item), 1, 0);
+    xprintf(("Returned: %i, %i, %i\n", tmp.red, tmp.green, tmp.blue));
+    tmp = access_file_data_array(((tFile_data *) get_element(file_data_list, 0)->item), 0, 1);
+    xprintf(("Returned: %i, %i, %i\n", tmp.red, tmp.green, tmp.blue));
+    tmp = access_file_data_array(((tFile_data *) get_element(file_data_list, 0)->item), 47, 0);
+    xprintf(("Returned: %i, %i, %i\n", tmp.red, tmp.green, tmp.blue));
+    tmp = access_file_data_array(((tFile_data *) get_element(file_data_list, 0)->item), 47, 48);
+    xprintf(("Returned: %i, %i, %i\n", tmp.red, tmp.green, tmp.blue));
+    tmp = access_file_data_array(((tFile_data *) get_element(file_data_list, 0)->item), 25, 25);
+    xprintf(("Returned: %i, %i, %i\n", tmp.red, tmp.green, tmp.blue));
+
     exit(EXIT_SUCCESS);
 }
