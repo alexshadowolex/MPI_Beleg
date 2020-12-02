@@ -119,12 +119,12 @@ tFile_data * read_picture(char * file_name){
     if (data){ 
         free(data);
     } else {
-        printf("Failed loading data of picture %s\n", file_name);
+        time_printf(("Failed loading data of picture %s\n", file_name));
     }
     /*
-    data = stbi_load(file_name, &width, &height,  0, 1); if (data) free(data); else printf("Failed 1\n");
-    data = stbi_load(file_name, &width, &height,  0, 2); if (data) free(data); else printf("Failed 2\n");
-    data = stbi_load(file_name, &width, &height,  0, 3); if (data) free(data); else printf("Failed 3\n");
+    data = stbi_load(file_name, &width, &height,  0, 1); if (data) free(data); else time_printf(("Failed 1\n"));
+    data = stbi_load(file_name, &width, &height,  0, 2); if (data) free(data); else time_printf(("Failed 2\n"));
+    data = stbi_load(file_name, &width, &height,  0, 3); if (data) free(data); else time_printf(("Failed 3\n"));
     */
 
 
@@ -163,7 +163,7 @@ tFile_data * read_picture(char * file_name){
         xprintf(("Terminal output for %s completed\n", file_name));
 
 #ifdef X11_DISPLAY
-        printf("Showing picture on X11 display\n");
+        time_printf(("Showing picture on X11 display\n"));
 
         display=XOpenDisplay(NULL);
         visual=DefaultVisual(display, 0);
@@ -190,7 +190,7 @@ tFile_data * read_picture(char * file_name){
         // free(data);	    
 
     } else {
-        printf("Failed loading data on second try, picture %s\n", file_name);
+        time_printf(("Failed loading data on second try, picture %s\n", file_name));
     }
     return tmp;
 }
