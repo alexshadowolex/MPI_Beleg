@@ -173,7 +173,9 @@ tFile_data * read_picture(char * file_name){
 
 tPixel_data access_file_data_array(tFile_data * file, int x_width, int y_height){
     int access_index = y_height * file->width * 4 + x_width * 4;
-    // xprintf(("access_index = %i\n", access_index));
+#ifdef TEST_ACCESS
+    xprintf(("access_index = %i\n", access_index));
+#endif
     unsigned char red_char = file->data[access_index + 0];
     unsigned char green_char = file->data[access_index + 1];
     unsigned char blue_char = file->data[access_index + 2];
@@ -192,6 +194,11 @@ tPixel_data access_file_data_array(tFile_data * file, int x_width, int y_height)
         blue
     };
     return ret_value;
+}
+
+int get_amount_macro_blocks(tFile_data * ref_picture){
+    //Since every picture has an integer amount of macro blocks, the calculation is easy
+    return (ref_picture->height / 16) * (ref_picture->width / 16);
 }
 
 //===================SAD Functions===================

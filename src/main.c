@@ -39,6 +39,7 @@ int main(int argc, char ** argv){
                                                       ((float *) get_element(SAD_values_list, i)->item)
         ));
     }
+#ifdef TEST_ACCESS
     tPixel_data tmp;
     tmp = access_file_data_array(((tFile_data *) get_element(file_data_list, 0)->item), 0, 0);
     xprintf(("Returned: %i, %i, %i\n", tmp.red, tmp.green, tmp.blue));
@@ -52,6 +53,14 @@ int main(int argc, char ** argv){
     xprintf(("Returned: %i, %i, %i\n", tmp.red, tmp.green, tmp.blue));
     tmp = access_file_data_array(((tFile_data *) get_element(file_data_list, 0)->item), 25, 25);
     xprintf(("Returned: %i, %i, %i\n", tmp.red, tmp.green, tmp.blue));
+#endif
+
+#ifdef TEST_MACRO_CALC
+    for(i = 0; i < amount_files; i++){
+        tFile_data * tmp = (tFile_data *) get_element(file_data_list, 0)->item;
+        xprintf(("Amount macro blocks %s: %i\n", tmp->file_name, get_amount_macro_blocks(tmp)));
+    }
+#endif
 
     exit(EXIT_SUCCESS);
 }
