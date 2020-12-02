@@ -1,4 +1,6 @@
 #include "functions.h"
+#include <time.h>
+#include <sys/time.h>
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "../lib/stb/stb_image_write.h"
@@ -16,8 +18,30 @@
 //#define X11_DISPLAY
 
 
-//Globally uses vars
+//Globally used vars
 
+
+//Timestamp
+void print_timestamp(void){
+    char buffer[26];
+    int millisec;
+    struct tm* tm_info;
+    struct timeval tv;
+
+    gettimeofday(&tv, NULL);
+
+    millisec = lrint(tv.tv_usec/1000.0); // Round to nearest millisec
+    if (millisec>=1000) { // Allow for rounding up to nearest second
+    millisec -=1000;
+    tv.tv_sec++;
+    }
+
+    tm_info = localtime(&tv.tv_sec);
+
+
+    strftime(buffer, 26, "%H:%M:%S", tm_info);
+    printf("%s.%03d ", buffer, millisec);
+}
 
 //===================Reader Functions===================
 #ifdef X11_DISPLAY
@@ -202,17 +226,19 @@ int get_amount_macro_blocks(tFile_data * ref_picture){
 }
 
 /* Macro blocks are counted like this:
- * 6-7-8
- * 3-4-5
  * 0-1-2
+ * 3-4-5
+ * 6-7-8
  * The function returns the index of the left-upper pixel of a macro block (first: 0,0; second: 0,16;...)
  */
 void get_macro_block_begin(tFile_data * ref_picture, int number_macro_block, int index[]){
+    //returns: int[]{width, height}
     if(number_macro_block >= get_amount_macro_blocks(ref_picture)){
         return;
-    } 
-    int line = number_macro_block / 3;
-    int col = number_macro_block % 3;
+    }
+    int blocks_per_line = ref_picture->width / 16;
+    int line = number_macro_block / blocks_per_line;
+    int col = number_macro_block % blocks_per_line;
 
     int pixel_width = col * 16;
     int pixel_height = line * 16;
@@ -225,19 +251,74 @@ void get_macro_block_begin(tFile_data * ref_picture, int number_macro_block, int
 //Für jeden makroblock beim Testen des passenden verschiebungsvektor den jeweiligen sad-werte zu dem vektor speichern (struct?)
 //und nach beendigung alle werte vergleichen und den kleinsten nehmen und in eine liste speichern
 //Funktion kann frühzeitig beendt werden, wenn der Wert 0 gefunden wurde oder ein wert über dem aktuellen minimum liegt.
-//Schreiben einer funktion, die den indizierten zugriff auf die pixelwerte in passenden array-indize umwandelt
-float calculate_SAD(tFile_data * data_ref_picture, tFile_data * data_other_picture){
-    float SAD = 0;
-    //TODO Things dont work :(
-    //Make a better function
-    // int i, j;
-    // xprintf(("%s\n%s\n", data_ref_picture->data, data_other_picture->data));
-    // for(i = 0; i < data_ref_picture->width; i++){
-    //     for(j = 0; j < data_ref_picture->height; j++){
-    //         int access_index = i * data_ref_picture->width * 4 + j * 4;
-    //         xprintf(("Accessing element at index %i\n", access_index));
-    //         SAD = SAD + abs(data_other_picture->data[access_index] - data_ref_picture->data[access_index]);
-    //     }
-    // }
-    return SAD;
+
+tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, int distanze_motion_vector_search){
+    //The list holds for all macro blocks the best motion vector in a struct tMacro_Block_SAD
+    tList * all_macro_block_SAD = create_list();
+    int amount_macro_blocks = get_amount_macro_blocks(ref_picture);
+    int i, current_x_width_motion, current_y_height_motion, x_current_width_macro_block, y_current_height_macro_block;
+// #ifdef TEST_SAD_CALC
+    xprintf(("Distance motion vector: %i\n", distanze_motion_vector_search));
+// #endif
+    for(i = 0; i < amount_macro_blocks; i++){
+        //Compare all macro blocks
+        int begin_index[2];
+        get_macro_block_begin(ref_picture, i, begin_index);
+        float minimal_SAD = INT_MAX;
+        int x_width_motion;
+        int y_height_motion;
+        int found_minimal_SAD = 0;
+        for(current_x_width_motion = (-1) * distanze_motion_vector_search; 
+            current_x_width_motion <= distanze_motion_vector_search && !found_minimal_SAD; 
+            current_x_width_motion++){
+            for(current_y_height_motion = (-1) * distanze_motion_vector_search; 
+                current_y_height_motion <= distanze_motion_vector_search && !found_minimal_SAD; 
+                current_y_height_motion++){
+                float current_SAD = 0;
+                //Calculate minimal SAD and save the value and the fitting distance motion vector
+                //Iterate over all pixels in a macro block (16x16)
+                for(x_current_width_macro_block = begin_index[0]; x_current_width_macro_block < begin_index[0] + 16; x_current_width_macro_block++){
+                    for(y_current_height_macro_block = begin_index[1]; y_current_height_macro_block < begin_index[1] + 16; y_current_height_macro_block++){
+                        //Get current pixeldata from ref_picture
+                        tPixel_data ref_pixel = access_file_data_array(ref_picture, x_current_width_macro_block, y_current_height_macro_block);
+                        //Get current pixeldata from other_picture, moved by current motion vector
+                        tPixel_data other_pixel = access_file_data_array(other_picture, x_current_width_macro_block + current_x_width_motion, y_current_height_macro_block + current_y_height_motion);
+
+                        if(other_pixel.red == - 1){
+                            //Means we tried to access a pixel outside of the picture
+                            continue;
+                        }
+                        float ref_brightness = 0.30 * ref_pixel.red + 0.59 * ref_pixel.green + 0.11 * ref_pixel.blue;
+                        float other_brightness = 0.30 * other_pixel.red + 0.59 * other_pixel.green + 0.11 * other_pixel.blue;
+                        current_SAD += abs(ref_brightness - other_brightness);
+                    }
+                }
+                //Comparing minimal sad with the current vector and minimal SAD
+                if(current_SAD == 0){
+                    //Will stop the iterations, 0 is the total minimum
+                    found_minimal_SAD = 1;
+                }
+                if(current_SAD < minimal_SAD){
+                    //Save the lowest sad Value and the fitting motion vector
+#ifdef TEST_SAD_CALC
+                    xprintf(("Found new minimal SAD: %f\n", current_SAD));
+#endif
+                    minimal_SAD = current_SAD;
+                    x_width_motion = current_x_width_motion;
+                    y_height_motion = current_y_height_motion;
+                }
+            }
+        }
+        //Add vector for macro block here
+#ifdef TEST_SAD_CALC
+        xprintf(("Current macro block: %i\nMotion Vector: x_width = %i, y_height = %i\nSAD-value: %f\n", i, x_width_motion, y_height_motion, minimal_SAD));
+#endif
+        tMotion_Vector motion_vector = {x_width_motion, y_height_motion};
+        tMacro_Block_SAD * macro_block_SAD = (tMacro_Block_SAD *) malloc(sizeof(tMacro_Block_SAD));
+        macro_block_SAD->value_SAD = minimal_SAD;
+        macro_block_SAD->motion_vector = motion_vector;
+        append_element(all_macro_block_SAD, macro_block_SAD);
+    }
+
+    return all_macro_block_SAD;
 }

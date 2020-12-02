@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <string.h>
 #include "functions.h"
-#include "list.h"
 
 int main(int argc, char ** argv){
     // float hdr_data[200][200][3];
@@ -14,31 +13,55 @@ int main(int argc, char ** argv){
 
     int i;
     int amount_files = argc - 2;
-    int distanze_motion_vector_seatch = atoi(argv[1]);
+    int distanze_motion_vector_search = atoi(argv[1]);
     xprintf(("amount_files: %i\n\n", amount_files));
     tList * file_data_list = create_list();
 
     //Get the file data and store it in an array
+    print_timestamp();
+    printf("Starting to read %i files\n", amount_files);
     for (i = 0; i < amount_files; i++) {
         char * tmp_file_name = argv[i + 2];
         tFile_data * tmp_data = read_picture(tmp_file_name);
+        print_timestamp();
         printf("Reading file %s finished!\n", tmp_data->file_name);
         xprintf(("Data_size: %i | Picture_width: %i | Picture_Height: %i\n\n", (sizeof(tmp_data->data)), tmp_data->width, tmp_data->height));
         append_element(file_data_list, tmp_data);
     }
 
-    tList * SAD_values_list = create_list();
+    //This list is holding lists of tMacro_Block_SAD. At index 0, file_data_list[0] and file_data_list[1] are compared, 
+    //at index 1 file_data_list[0] and file_data_list[2] are compared etc.
+    tList * list_compared_pictures = create_list();
 
+    print_timestamp();
+    printf("Starting to calculate the motion vectors\n");
     for(i = 0; i < amount_files - 1; i++){
-        float * tmp_SAD = malloc(sizeof(float));
-        *tmp_SAD = calculate_SAD( (tFile_data *) get_element(file_data_list, 0)->item, (tFile_data *) get_element(file_data_list, i + 1)->item);
-        // xprintf(("SAD VALUE: %f\n", *tmp_SAD));
-        append_element(SAD_values_list, (float *)tmp_SAD);
-        xprintf(("SAD-value between %s and %s: %f\n", ((tFile_data *) get_element(file_data_list, 0)->item)->file_name, 
-                                                      ((tFile_data *) get_element(file_data_list, i + 1)->item)->file_name, 
-                                                      ((float *) get_element(SAD_values_list, i)->item)
+        append_element(
+            list_compared_pictures, 
+            calc_SAD_values(
+                (tFile_data *) get_element(file_data_list, 0)->item,
+                (tFile_data *) get_element(file_data_list, i + 1)->item,
+                distanze_motion_vector_search
+            )
+        );
+// #ifdef TEST_SAD_CALC
+        xprintf(("SAD values of vectors for macro blocks between %s and %s:\n", 
+            ((tFile_data *) get_element(file_data_list, 0)->item)->file_name, 
+            ((tFile_data *) get_element(file_data_list, i + 1)->item)->file_name 
         ));
+        int j;
+        tList * tmp_output_list = (tList *) get_element(list_compared_pictures, i)->item;
+        for(j = 0; j < tmp_output_list->size; j++){
+            tMacro_Block_SAD * tmp_macro = (tMacro_Block_SAD *) get_element(tmp_output_list, j)->item;
+            xprintf(("Block: %i; Vector: %i|%i; SAD-value: %f\n", j, tmp_macro->motion_vector.x_width, tmp_macro->motion_vector.y_height, tmp_macro->value_SAD));
+        }
+// #endif
+
     }
+
+    print_timestamp();
+    printf("Finished calculating the motion vectors\n");
+
 #ifdef TEST_ACCESS
     tPixel_data tmp;
     tmp = access_file_data_array(((tFile_data *) get_element(file_data_list, 0)->item), 0, 0);
@@ -69,6 +92,9 @@ int main(int argc, char ** argv){
         }
     }
 #endif
+
+    print_timestamp();
+    printf("Finished running the program!\n");
 
     exit(EXIT_SUCCESS);
 }
