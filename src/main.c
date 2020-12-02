@@ -15,7 +15,7 @@ int main(int argc, char ** argv){
     int i;
     int amount_files = argc - 2;
     int distanze_motion_vector_seatch = atoi(argv[1]);
-    xprintf(("amount_files: %i\n", amount_files));
+    xprintf(("amount_files: %i\n\n", amount_files));
     tList * file_data_list = create_list();
 
     //Get the file data and store it in an array
@@ -23,7 +23,7 @@ int main(int argc, char ** argv){
         char * tmp_file_name = argv[i + 2];
         tFile_data * tmp_data = read_picture(tmp_file_name);
         printf("Reading file %s finished!\n", tmp_data->file_name);
-        xprintf(("Data_size: %i | Picture_width: %i | Picture_Height: %i\n", (sizeof(tmp_data->data)), tmp_data->width, tmp_data->height));
+        xprintf(("Data_size: %i | Picture_width: %i | Picture_Height: %i\n\n", (sizeof(tmp_data->data)), tmp_data->width, tmp_data->height));
         append_element(file_data_list, tmp_data);
     }
 
@@ -57,8 +57,16 @@ int main(int argc, char ** argv){
 
 #ifdef TEST_MACRO_CALC
     for(i = 0; i < amount_files; i++){
-        tFile_data * tmp = (tFile_data *) get_element(file_data_list, 0)->item;
-        xprintf(("Amount macro blocks %s: %i\n", tmp->file_name, get_amount_macro_blocks(tmp)));
+        tFile_data * tmp = (tFile_data *) get_element(file_data_list, i)->item;
+        int amount_macro_blocks = get_amount_macro_blocks(tmp);
+        xprintf(("Amount macro blocks %s: %i\n", tmp->file_name, amount_macro_blocks));
+
+        int j;
+        for(j = 0; j < amount_macro_blocks; j++){
+            int index[2];
+            int * tmp_int = get_macro_block_begin(tmp, j, index);
+            xprintf(("Begin macro block %i: width = %i, height = %i\n", j, tmp_int[0], tmp_int[1]));
+        }
     }
 #endif
 

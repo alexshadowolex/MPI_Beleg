@@ -16,6 +16,7 @@ tFile_data * read_picture(char * file_name);
 tPixel_data access_file_data_array(tFile_data * file, int width, int height);
 float calculate_SAD(tFile_data * data_ref_picture, tFile_data * data_other_picture);
 int get_amount_macro_blocks(tFile_data * ref_picture);
+int * get_macro_block_begin(tFile_data * ref_picture, int number_macro_block, int index[]);
 
 #ifdef DEBUG
 #define xprintf(x) printf x

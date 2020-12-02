@@ -201,6 +201,31 @@ int get_amount_macro_blocks(tFile_data * ref_picture){
     return (ref_picture->height / 16) * (ref_picture->width / 16);
 }
 
+/* Macro blocks are counted like this:
+ * 6-7-8
+ * 3-4-5
+ * 0-1-2
+ * The function returns the index of the left-upper pixel of a macro block (first: 0,0; second: 0,16;...)
+ */
+int * get_macro_block_begin(tFile_data * ref_picture, int number_macro_block, int index[]){
+    if(number_macro_block >= get_amount_macro_blocks(ref_picture)){
+        return NULL;
+    } 
+    int line = number_macro_block / 3;
+    int col = number_macro_block % 3;
+
+    int pixel_width = col * 16;
+    int pixel_height = line * 16;
+
+#ifdef TEST_MACRO_CALC
+    xprintf(("Line: %i; pixel_height: %i\nCol: %i; pixel_width: %i\n", line, pixel_height, col, pixel_width));
+#endif
+
+    index[0] = pixel_width;
+    index[1] = pixel_height;
+    return index;
+}
+
 //===================SAD Functions===================
 //Für jeden makroblock beim Testen des passenden verschiebungsvektor den jeweiligen sad-werte zu dem vektor speichern (struct?)
 //und nach beendigung alle werte vergleichen und den kleinsten nehmen und in eine liste speichern
