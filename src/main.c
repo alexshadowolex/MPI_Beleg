@@ -22,7 +22,6 @@ int main(int argc, char ** argv){
     for (i = 0; i < amount_files; i++) {
         char * tmp_file_name = argv[i + 2];
         tFile_data * tmp_data = read_picture(tmp_file_name);
-        print_timestamp();
         time_printf(("Reading file %s finished!\n", tmp_data->file_name));
         xprintf(("Data_size: %i | Picture_width: %i | Picture_Height: %i\n\n", (sizeof(tmp_data->data)), tmp_data->width, tmp_data->height));
         append_element(file_data_list, tmp_data);
@@ -32,7 +31,6 @@ int main(int argc, char ** argv){
     //at index 1 file_data_list[0] and file_data_list[2] are compared etc.
     tList * list_compared_pictures = create_list();
 
-    print_timestamp();
     time_printf(("Starting to calculate the motion vectors\n"));
     for(i = 0; i < amount_files - 1; i++){
         append_element(
@@ -58,7 +56,6 @@ int main(int argc, char ** argv){
 
     }
 
-    print_timestamp();
     time_printf(("Finished calculating the motion vectors\n"));
 
 #ifdef TEST_ACCESS
@@ -92,7 +89,6 @@ int main(int argc, char ** argv){
     }
 #endif
 
-    print_timestamp();
     time_printf(("Finished running the program!\n"));
 
     exit(EXIT_SUCCESS);

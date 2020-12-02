@@ -31,6 +31,8 @@ int get_amount_macro_blocks(tFile_data * ref_picture);
 void get_macro_block_begin(tFile_data * ref_picture, int number_macro_block, int index[]);
 tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, int distanze_motion_vector_search);
 
+#define SIZE_MACRO_BLOCK 16
+
 #define time_printf(x) print_timestamp(); printf x
 
 #ifdef DEBUG

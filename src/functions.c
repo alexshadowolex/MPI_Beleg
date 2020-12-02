@@ -222,7 +222,7 @@ tPixel_data access_file_data_array(tFile_data * file, int x_width, int y_height)
 
 int get_amount_macro_blocks(tFile_data * ref_picture){
     //Since every picture has an integer amount of macro blocks, the calculation is easy
-    return (ref_picture->height / 16) * (ref_picture->width / 16);
+    return (ref_picture->height / SIZE_MACRO_BLOCK) * (ref_picture->width / SIZE_MACRO_BLOCK);
 }
 
 /* Macro blocks are counted like this:
@@ -236,12 +236,12 @@ void get_macro_block_begin(tFile_data * ref_picture, int number_macro_block, int
     if(number_macro_block >= get_amount_macro_blocks(ref_picture)){
         return;
     }
-    int blocks_per_line = ref_picture->width / 16;
+    int blocks_per_line = ref_picture->width / SIZE_MACRO_BLOCK;
     int line = number_macro_block / blocks_per_line;
     int col = number_macro_block % blocks_per_line;
 
-    int pixel_width = col * 16;
-    int pixel_height = line * 16;
+    int pixel_width = col * SIZE_MACRO_BLOCK;
+    int pixel_height = line * SIZE_MACRO_BLOCK;
 
     index[0] = pixel_width;
     index[1] = pixel_height;
@@ -276,9 +276,9 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
                 current_y_height_motion++){
                 float current_SAD = 0;
                 //Calculate minimal SAD and save the value and the fitting distance motion vector
-                //Iterate over all pixels in a macro block (16x16)
-                for(x_current_width_macro_block = begin_index[0]; x_current_width_macro_block < begin_index[0] + 16; x_current_width_macro_block++){
-                    for(y_current_height_macro_block = begin_index[1]; y_current_height_macro_block < begin_index[1] + 16; y_current_height_macro_block++){
+                //Iterate over all pixels in a macro block (SIZE_MACRO_BLOCK x SIZE_MACRO_BLOCK)
+                for(x_current_width_macro_block = begin_index[0]; x_current_width_macro_block < begin_index[0] + SIZE_MACRO_BLOCK; x_current_width_macro_block++){
+                    for(y_current_height_macro_block = begin_index[1]; y_current_height_macro_block < begin_index[1] + SIZE_MACRO_BLOCK; y_current_height_macro_block++){
                         //Get current pixeldata from ref_picture
                         tPixel_data ref_pixel = access_file_data_array(ref_picture, x_current_width_macro_block, y_current_height_macro_block);
                         //Get current pixeldata from other_picture, moved by current motion vector
