@@ -64,8 +64,8 @@ int main(int argc, char ** argv){
         int j;
         for(j = 0; j < amount_macro_blocks; j++){
             int index[2];
-            int * tmp_int = get_macro_block_begin(tmp, j, index);
-            xprintf(("Begin macro block %i: width = %i, height = %i\n", j, tmp_int[0], tmp_int[1]));
+            get_macro_block_begin(tmp, j, index);
+            xprintf(("Begin macro block %i: width = %i, height = %i\n", j, index[0], index[1]));
         }
     }
 #endif

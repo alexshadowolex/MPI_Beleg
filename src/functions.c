@@ -207,9 +207,9 @@ int get_amount_macro_blocks(tFile_data * ref_picture){
  * 0-1-2
  * The function returns the index of the left-upper pixel of a macro block (first: 0,0; second: 0,16;...)
  */
-int * get_macro_block_begin(tFile_data * ref_picture, int number_macro_block, int index[]){
+void get_macro_block_begin(tFile_data * ref_picture, int number_macro_block, int index[]){
     if(number_macro_block >= get_amount_macro_blocks(ref_picture)){
-        return NULL;
+        return;
     } 
     int line = number_macro_block / 3;
     int col = number_macro_block % 3;
@@ -217,13 +217,8 @@ int * get_macro_block_begin(tFile_data * ref_picture, int number_macro_block, in
     int pixel_width = col * 16;
     int pixel_height = line * 16;
 
-#ifdef TEST_MACRO_CALC
-    xprintf(("Line: %i; pixel_height: %i\nCol: %i; pixel_width: %i\n", line, pixel_height, col, pixel_width));
-#endif
-
     index[0] = pixel_width;
     index[1] = pixel_height;
-    return index;
 }
 
 //===================SAD Functions===================
