@@ -268,6 +268,7 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
         int x_width_motion;
         int y_height_motion;
         int found_minimal_SAD = 0;
+        //TODO Iteration as a snail (starting at 0|0)
         for(current_x_width_motion = (-1) * distanze_motion_vector_search; 
             current_x_width_motion <= distanze_motion_vector_search && !found_minimal_SAD; 
             current_x_width_motion++){
@@ -277,8 +278,12 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
                 float current_SAD = 0;
                 //Calculate minimal SAD and save the value and the fitting distance motion vector
                 //Iterate over all pixels in a macro block (SIZE_MACRO_BLOCK x SIZE_MACRO_BLOCK)
-                for(x_current_width_macro_block = begin_index[0]; x_current_width_macro_block < begin_index[0] + SIZE_MACRO_BLOCK; x_current_width_macro_block++){
-                    for(y_current_height_macro_block = begin_index[1]; y_current_height_macro_block < begin_index[1] + SIZE_MACRO_BLOCK; y_current_height_macro_block++){
+                for(x_current_width_macro_block = begin_index[0]; 
+                    x_current_width_macro_block < begin_index[0] + SIZE_MACRO_BLOCK;
+                    x_current_width_macro_block++){
+                    for(y_current_height_macro_block = begin_index[1]; 
+                        y_current_height_macro_block < begin_index[1] + SIZE_MACRO_BLOCK; 
+                        y_current_height_macro_block++){
                         //Get current pixeldata from ref_picture
                         tPixel_data ref_pixel = access_file_data_array(ref_picture, x_current_width_macro_block, y_current_height_macro_block);
                         //Get current pixeldata from other_picture, moved by current motion vector
@@ -286,6 +291,7 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
 
                         if(other_pixel.red == - 1){
                             //Means we tried to access a pixel outside of the picture
+                            current_SAD += INT_MAX / 2;
                             continue;
                         }
                         float ref_brightness = 0.30 * ref_pixel.red + 0.59 * ref_pixel.green + 0.11 * ref_pixel.blue;
@@ -318,6 +324,11 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
         macro_block_SAD->value_SAD = minimal_SAD;
         macro_block_SAD->motion_vector = motion_vector;
         append_element(all_macro_block_SAD, macro_block_SAD);
+
+        // float progress = (i / amount_macro_blocks) * 100;
+        // if(progress == 10 || progress == 20 || progress == 30 || progress == 40 || progress == 50 || progress == 60 || progress == 70 || progress == 80 || progress == 90 || progress == 100){
+        //     time_printf(("Progress comparing %s and %s: %f\%\n", ref_picture->file_name, other_picture->file_name, progress));
+        // }
     }
 
     return all_macro_block_SAD;
