@@ -5,6 +5,9 @@ lib
 files/*.pdf
 files/*.png
 
+# But those are usefull!
+!iteration_best_motion_vector.png
+
 # .vscode-folder
 .vscode
 
