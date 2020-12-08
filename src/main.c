@@ -41,7 +41,7 @@ int main(int argc, char ** argv){
                 distanze_motion_vector_search
             )
         );
-#ifdef TEST_SAD_CALC
+#ifdef TEST_SAD_CALC_OUTPUT
         xprintf(("SAD values of vectors for macro blocks between %s and %s:\n", 
             ((tFile_data *) get_element(file_data_list, 0)->item)->file_name, 
             ((tFile_data *) get_element(file_data_list, i + 1)->item)->file_name 

@@ -13,14 +13,14 @@ typedef struct sPixel_data{
     int blue;
 }tPixel_data;
 
-typedef struct sMotion_Vector{
+typedef struct sPixel_index{
     int x_width;
     int y_height;
-}tMotion_Vector;
+}tPixel_index;
 
 typedef struct sMacro_Block_SAD{
     float value_SAD;
-    tMotion_Vector motion_vector;
+    tPixel_index motion_vector;
 }tMacro_Block_SAD;
 
 void print_timestamp(void);
@@ -29,6 +29,7 @@ tFile_data * read_picture(char * file_name);
 tPixel_data access_file_data_array(tFile_data * file, int width, int height);
 int get_amount_macro_blocks(tFile_data * ref_picture);
 void get_macro_block_begin(tFile_data * ref_picture, int number_macro_block, int index[]);
+tPixel_index get_next_motion_vector(int iteration);
 tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, int distanze_motion_vector_search);
 
 #define SIZE_MACRO_BLOCK 16

@@ -247,6 +247,70 @@ void get_macro_block_begin(tFile_data * ref_picture, int number_macro_block, int
     index[1] = pixel_height;
 }
 
+tPixel_index get_next_motion_vector(int iteration){
+    int tmp_x;
+    int tmp_y;
+
+    //Checking, which distance we are searching through with the current iteration
+    int current_distance = 0;
+    while(1){
+        if(((current_distance * 2) + 1) * ((current_distance * 2) + 1) > iteration){
+            break;
+        }
+        current_distance++;
+    }
+
+    if(current_distance == 0){
+        tmp_x = 0;
+        tmp_y = 0;
+    } else {
+        //Substract all possible motion vectors that happened before our current distance
+        //TODO Block: 0; Vector: 24|4; SAD-value: 0.000000 comes for paint 1 and 2, can't be possible tho!!
+        iteration -= (((current_distance - 1) * 2) + 1) * (((current_distance - 1) * 2) + 1);
+        int tmp_iteration;
+        int move_x;
+        int move_y;
+        for(tmp_iteration = 0; tmp_iteration <= iteration; tmp_iteration++){
+            if(tmp_iteration == 0){ 
+                tmp_y = current_distance;
+                tmp_x = 0;
+                move_x = 1;
+                move_y = 0;
+            } else {
+                // Checking if we reached one corner, so we can change the direction we are moving towards
+                if(move_x != 0 && abs(tmp_x) == current_distance){
+                    //Corner reached and x was moving, stop moving x
+                    move_x = 0;
+                    //Check where y needs to get move towards
+                    //If y is at the postive end, move to towards the negative end
+                    if(move_y == current_distance){
+                        move_y = -1;
+                    } else {
+                        move_y = 1;
+                    }
+                }
+                //See above
+                if(move_y != 0 && abs(tmp_y) == current_distance){
+                    move_y = 0;
+                    if(move_x == current_distance){
+                        move_x = -1;
+                    } else {
+                        move_x = 1;
+                    }
+                }
+
+                tmp_x += move_x;
+                tmp_y += move_y;
+            }
+        }
+    }
+
+    tPixel_index ret_vector;
+    ret_vector.x_width = tmp_x;
+    ret_vector.y_height = tmp_y;
+    return ret_vector;
+}
+
 //===================SAD Functions===================
 //Für jeden makroblock beim Testen des passenden verschiebungsvektor den jeweiligen sad-werte zu dem vektor speichern (struct?)
 //und nach beendigung alle werte vergleichen und den kleinsten nehmen und in eine liste speichern
@@ -257,6 +321,8 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
     tList * all_macro_block_SAD = create_list();
     int amount_macro_blocks = get_amount_macro_blocks(ref_picture);
     int i, current_x_width_motion, current_y_height_motion, x_current_width_macro_block, y_current_height_macro_block;
+    //for the distance 1, the amount is 9, for 2 it's 25 etc.
+    int amount_motion_vectors = ((distanze_motion_vector_search * 2) + 1) * ((distanze_motion_vector_search * 2) + 1);
 // #ifdef TEST_SAD_CALC
     xprintf(("Distance motion vector: %i\n", distanze_motion_vector_search));
 // #endif
@@ -267,59 +333,59 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
         float minimal_SAD = INT_MAX;
         int x_width_motion;
         int y_height_motion;
+        int j;
         int found_minimal_SAD = 0;
-        //TODO Iteration as a snail (starting at 0|0)
-        for(current_x_width_motion = (-1) * distanze_motion_vector_search; 
-            current_x_width_motion <= distanze_motion_vector_search && !found_minimal_SAD; 
-            current_x_width_motion++){
-            for(current_y_height_motion = (-1) * distanze_motion_vector_search; 
-                current_y_height_motion <= distanze_motion_vector_search && !found_minimal_SAD; 
-                current_y_height_motion++){
-                float current_SAD = 0;
-                //Calculate minimal SAD and save the value and the fitting distance motion vector
-                //Iterate over all pixels in a macro block (SIZE_MACRO_BLOCK x SIZE_MACRO_BLOCK)
-                for(x_current_width_macro_block = begin_index[0]; 
-                    x_current_width_macro_block < begin_index[0] + SIZE_MACRO_BLOCK;
-                    x_current_width_macro_block++){
-                    for(y_current_height_macro_block = begin_index[1]; 
-                        y_current_height_macro_block < begin_index[1] + SIZE_MACRO_BLOCK; 
-                        y_current_height_macro_block++){
-                        //Get current pixeldata from ref_picture
-                        tPixel_data ref_pixel = access_file_data_array(ref_picture, x_current_width_macro_block, y_current_height_macro_block);
-                        //Get current pixeldata from other_picture, moved by current motion vector
-                        tPixel_data other_pixel = access_file_data_array(other_picture, x_current_width_macro_block + current_x_width_motion, y_current_height_macro_block + current_y_height_motion);
+        //get_next_motion_vector will return values for the iteration
+        //amount_motion_vectors is the amount of motion vectors that have to get tested
+        for(j = 0; j < amount_motion_vectors; j++){
+            tPixel_index next_motion_vector = get_next_motion_vector(j);
+            current_x_width_motion = next_motion_vector.x_width;
+            current_y_height_motion = next_motion_vector.y_height;
+            float current_SAD = 0;
+            //Calculate minimal SAD and save the value and the fitting distance motion vector
+            //Iterate over all pixels in a macro block (SIZE_MACRO_BLOCK x SIZE_MACRO_BLOCK)
+            for(x_current_width_macro_block = begin_index[0]; 
+                x_current_width_macro_block < begin_index[0] + SIZE_MACRO_BLOCK;
+                x_current_width_macro_block++){
+                for(y_current_height_macro_block = begin_index[1]; 
+                    y_current_height_macro_block < begin_index[1] + SIZE_MACRO_BLOCK; 
+                    y_current_height_macro_block++){
+                    
+                    //Get current pixeldata from ref_picture
+                    tPixel_data ref_pixel = access_file_data_array(ref_picture, x_current_width_macro_block + current_x_width_motion, y_current_height_macro_block + current_y_height_motion);
+                    //Get current pixeldata from other_picture, moved by current motion vector
+                    tPixel_data other_pixel = access_file_data_array(other_picture, x_current_width_macro_block, y_current_height_macro_block);
 
-                        if(other_pixel.red == - 1){
-                            //Means we tried to access a pixel outside of the picture
-                            current_SAD += INT_MAX / 2;
-                            continue;
-                        }
-                        float ref_brightness = 0.30 * ref_pixel.red + 0.59 * ref_pixel.green + 0.11 * ref_pixel.blue;
-                        float other_brightness = 0.30 * other_pixel.red + 0.59 * other_pixel.green + 0.11 * other_pixel.blue;
-                        current_SAD += abs(ref_brightness - other_brightness);
+                    if(ref_pixel.red == - 1){
+                        //Means we tried to access a pixel outside of the picture
+                        current_SAD += INT_MAX / 2;
+                        continue;
                     }
+                    float ref_brightness = 0.30 * ref_pixel.red + 0.59 * ref_pixel.green + 0.11 * ref_pixel.blue;
+                    float other_brightness = 0.30 * other_pixel.red + 0.59 * other_pixel.green + 0.11 * other_pixel.blue;
+                    current_SAD += abs(ref_brightness - other_brightness);
                 }
-                //Comparing minimal sad with the current vector and minimal SAD
-                if(current_SAD == 0){
-                    //Will stop the iterations, 0 is the total minimum
-                    found_minimal_SAD = 1;
-                }
-                if(current_SAD < minimal_SAD){
-                    //Save the lowest sad Value and the fitting motion vector
+            }
+            //Comparing minimal sad with the current vector and minimal SAD
+            if(current_SAD == 0){
+                //Will stop the iterations, 0 is the total minimum
+                found_minimal_SAD = 1;
+            }
+            if(current_SAD < minimal_SAD){
+                //Save the lowest sad Value and the fitting motion vector
 #ifdef TEST_SAD_CALC
-                    xprintf(("Found new minimal SAD: %f\n", current_SAD));
+                xprintf(("Found new minimal SAD: %f\n", current_SAD));
 #endif
-                    minimal_SAD = current_SAD;
-                    x_width_motion = current_x_width_motion;
-                    y_height_motion = current_y_height_motion;
-                }
+                minimal_SAD = current_SAD;
+                x_width_motion = current_x_width_motion;
+                y_height_motion = current_y_height_motion;
             }
         }
         //Add vector for macro block here
 #ifdef TEST_SAD_CALC
         xprintf(("Current macro block: %i\nMotion Vector: x_width = %i, y_height = %i\nSAD-value: %f\n", i, x_width_motion, y_height_motion, minimal_SAD));
 #endif
-        tMotion_Vector motion_vector = {x_width_motion, y_height_motion};
+        tPixel_index motion_vector = {x_width_motion, y_height_motion};
         tMacro_Block_SAD * macro_block_SAD = (tMacro_Block_SAD *) malloc(sizeof(tMacro_Block_SAD));
         macro_block_SAD->value_SAD = minimal_SAD;
         macro_block_SAD->motion_vector = motion_vector;
