@@ -1,5 +1,6 @@
 #include "functions.h"
 #include <time.h>
+#include <stdio.h>
 #include <sys/time.h>
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
@@ -265,7 +266,6 @@ tPixel_index get_next_motion_vector(int iteration){
         tmp_y = 0;
     } else {
         //Substract all possible motion vectors that happened before our current distance
-        //TODO Block: 0; Vector: 24|4; SAD-value: 0.000000 comes for paint 1 and 2, can't be possible tho!!
         iteration -= (((current_distance - 1) * 2) + 1) * (((current_distance - 1) * 2) + 1);
         int tmp_iteration;
         int move_x;
@@ -283,22 +283,23 @@ tPixel_index get_next_motion_vector(int iteration){
                     move_x = 0;
                     //Check where y needs to get move towards
                     //If y is at the postive end, move to towards the negative end
-                    if(move_y == current_distance){
+                    if(tmp_y == current_distance){
                         move_y = -1;
                     } else {
                         move_y = 1;
                     }
-                }
-                //See above
-                if(move_y != 0 && abs(tmp_y) == current_distance){
-                    move_y = 0;
-                    if(move_x == current_distance){
-                        move_x = -1;
-                    } else {
-                        move_x = 1;
+                } else {
+                    //Only one can happen in a direction change
+                    if(move_y != 0 && abs(tmp_y) == current_distance){
+                        move_y = 0;
+                        if(tmp_x == current_distance){
+                            move_x = -1;
+                        } else {
+                            move_x = 1;
+                        }
                     }
                 }
-
+                
                 tmp_x += move_x;
                 tmp_y += move_y;
             }
