@@ -226,6 +226,7 @@ int get_amount_macro_blocks(tFile_data * ref_picture){
     return (ref_picture->height / SIZE_MACRO_BLOCK) * (ref_picture->width / SIZE_MACRO_BLOCK);
 }
 
+//===================SAD Functions===================
 /* Macro blocks are counted like this:
  * 0-1-2
  * 3-4-5
@@ -233,7 +234,7 @@ int get_amount_macro_blocks(tFile_data * ref_picture){
  * The function returns the index of the left-upper pixel of a macro block (first: 0,0; second: 0,16;...)
  */
 void get_macro_block_begin(tFile_data * ref_picture, int number_macro_block, int index[]){
-    //returns: int[]{width, height}
+    //returns: int[]{width, height}, pointing at the index of the left upper pixel
     if(number_macro_block >= get_amount_macro_blocks(ref_picture)){
         return;
     }
@@ -248,6 +249,7 @@ void get_macro_block_begin(tFile_data * ref_picture, int number_macro_block, int
     index[1] = pixel_height;
 }
 
+//Gets next motion vector as snail like iteration through all possibilities
 tPixel_index get_next_motion_vector(int iteration){
     int tmp_x;
     int tmp_y;
@@ -312,11 +314,7 @@ tPixel_index get_next_motion_vector(int iteration){
     return ret_vector;
 }
 
-//===================SAD Functions===================
-//Für jeden makroblock beim Testen des passenden verschiebungsvektor den jeweiligen sad-werte zu dem vektor speichern (struct?)
-//und nach beendigung alle werte vergleichen und den kleinsten nehmen und in eine liste speichern
-//Funktion kann frühzeitig beendt werden, wenn der Wert 0 gefunden wurde oder ein wert über dem aktuellen minimum liegt.
-
+//Calculates the SAD values for all possible motion vectors for all macro blocks
 tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, int distanze_motion_vector_search){
     //The list holds for all macro blocks the best motion vector in a struct tMacro_Block_SAD
     tList * all_macro_block_SAD = create_list();
