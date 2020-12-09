@@ -5,6 +5,9 @@ lib
 files/*.pdf
 files/*.png
 
+# Ignoring encoded pictures
+*.bpg
+
 # But those are usefull!
 !iteration_best_motion_vector.png
 
