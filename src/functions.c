@@ -416,7 +416,7 @@ int encode_files(tList * file_data, tList * compared_pictures){
         memcpy(file_name, current_picture->file_name, strlen(current_picture->file_name));
         strcat(file_name, ".bpg");
         xprintf(("file_name: %s\n", file_name));
-        FILE * file = fopen(file_name, "ab+");
+        FILE * file = fopen(file_name, "w+");
 
         //Write the amount of macroblocks to the file
         int amount_macro_blocks = get_amount_macro_blocks(current_picture);
