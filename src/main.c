@@ -89,6 +89,15 @@ int main(int argc, char ** argv){
     }
 #endif
 
+    time_printf(("Starting to encode all files\n"));
+
+    int ret_value = encode_files(file_data_list, list_compared_pictures);
+    if(ret_value == EXIT_FAILURE){
+        exit(EXIT_FAILURE);
+    }
+
+    time_printf(("Finished encoding all files\n"));
+
     time_printf(("Finished running the program!\n"));
 
     exit(EXIT_SUCCESS);
