@@ -45,3 +45,8 @@ Programmiersprachen: C, C++, MPI, (wahlweise MPI-Threads), stb-lib (zum lesen vo
   * Pixel in Bild mit 2x2 Macroblöcke     Codierte Datei nach Macroblöcken (jeder pixel enthält rgb-farben und ein leerzeichen (4 byte))
   * 0-1-2-3-4-5-6                     ->  0-1-7-8-2-3-9-0-4-5-1-2-6-3
   * 7-8-9-0-1-2-3
+
+### TODOS: 
+* SAD-Berechnung nicht in gecasteten ints, sondern in unsigned char
+* Schreiben eines signed shorts für rgb mit echter differenz (auch negativ) (Struct mit signed shorts (sollte 6 byte sein)) ggf. mit dummy wert erweitern auf 8 byte, testen! 
+* Abbruch für das Finden einer 0 als SAD-Wert und das Überschreiten des Minimalen SAD-Werts implementieren
