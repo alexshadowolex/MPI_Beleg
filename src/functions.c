@@ -406,7 +406,6 @@ int encode_files(tList * file_data, tList * compared_pictures){
     char space_character[] = " ";
     //Get the reference picture and data
     tFile_data * ref_picture = (tFile_data *) get_element(file_data, 0)->item;
-    char * ref_data = ref_picture->data;
 
     for(i = 0; i < compared_pictures->size; i++){
         //Get the current picture to encode
@@ -423,27 +422,52 @@ int encode_files(tList * file_data, tList * compared_pictures){
         fwrite(&amount_macro_blocks, sizeof(int), 1, file);
         fwrite(space_character, sizeof(char), 1, file);
 
-        char * current_data = current_picture->data;
         //Get all macro blocks data
         tList * current_all_macro_blocks = (tList *) get_element(compared_pictures, i)->item;
-        
         //Write all motion vectors to the file
         int iterator_motion_vectors;
         for(iterator_motion_vectors = 0; iterator_motion_vectors < current_all_macro_blocks->size; iterator_motion_vectors++){
-            tMacro_Block_SAD * tmp_block_info = (tMacro_Block_SAD *) get_element(current_all_macro_blocks, iterator_motion_vectors);
+            tMacro_Block_SAD * tmp_block_info = (tMacro_Block_SAD *) get_element(current_all_macro_blocks, iterator_motion_vectors)->item;
             tPixel_index current_motion_vector = tmp_block_info->motion_vector;
 
             fwrite(&current_motion_vector.x_width, sizeof(int), 1, file);
             fwrite(&current_motion_vector.y_height, sizeof(int), 1, file);
-            fwrite(space_character, sizeof(char), 1, file);
+            // fwrite(space_character, sizeof(char), 1, file);
         }
+        xprintf(("Wrote motion vectors\n"));
 
         //Write all decoded data
         int iterator_macro_blocks;
         for(iterator_macro_blocks = 0; iterator_macro_blocks < current_all_macro_blocks->size; iterator_macro_blocks++){
-            tMacro_Block_SAD * tmp_block_info = (tMacro_Block_SAD *) get_element(current_all_macro_blocks, iterator_motion_vectors);
+            tMacro_Block_SAD * tmp_block_info = (tMacro_Block_SAD *) get_element(current_all_macro_blocks, iterator_macro_blocks)->item;
             //TODO: How is this happening.. int difference, cast back to unsigned char?
             //TODO: How are negative differences handled. With abs()? And what about decoding it?
+            tPixel_index motion_vector = tmp_block_info->motion_vector;
+            int begin_macro_block[2];
+            get_macro_block_begin(current_picture, iterator_macro_blocks, begin_macro_block);
+            int width, height;
+
+            for(width = begin_macro_block[0]; width < begin_macro_block[0] + SIZE_MACRO_BLOCK; width++){
+                for(height = begin_macro_block[1]; height < begin_macro_block[1] + SIZE_MACRO_BLOCK; height++){
+                    tPixel_data tmp_current_data = access_file_data_array(current_picture, width, height);
+                    tPixel_data tmp_ref_data = access_file_data_array(ref_picture, width + motion_vector.x_width, height + motion_vector.y_height);
+                    
+                    //Differenz in signed shorts
+                    tPixel_data resulting_data = {
+                        abs(tmp_current_data.red - tmp_ref_data.red),
+                        abs(tmp_current_data.green - tmp_ref_data.green),
+                        abs(tmp_current_data.blue - tmp_ref_data.blue)
+                    };
+                    unsigned char write_red[] = {(char) resulting_data.red};
+                    unsigned char write_green[] = {(char) resulting_data.green};
+                    unsigned char write_blue[] = {(char) resulting_data.blue};
+                    fwrite(write_red, sizeof(char), 1, file);
+                    fwrite(write_green, sizeof(char), 1, file);
+                    fwrite(write_blue, sizeof(char), 1, file);
+                    fwrite(space_character, sizeof(char), 1, file);
+                    
+                }
+            }
         }
     }
 
