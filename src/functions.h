@@ -43,6 +43,8 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
 
 int encode_files(tList * file_data, tList * compared_pictures);
 
+void end_programm(tList * file_data_list, tList * list_compared_pictures);
+
 #define SIZE_MACRO_BLOCK 16
 
 #define time_printf(x) print_timestamp(); printf x

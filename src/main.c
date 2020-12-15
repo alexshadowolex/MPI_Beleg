@@ -98,6 +98,12 @@ int main(int argc, char ** argv){
 
     time_printf(("Finished encoding all files\n"));
 
+    time_printf(("Starting to free all maloced data\n"));
+
+    end_programm(file_data_list, list_compared_pictures);
+
+    time_printf(("Finished freeing all maloced data\n"));
+
     time_printf(("Finished running the program!\n"));
 
     exit(EXIT_SUCCESS);

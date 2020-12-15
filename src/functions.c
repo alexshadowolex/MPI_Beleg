@@ -471,3 +471,32 @@ int encode_files(tList * file_data, tList * compared_pictures){
 
     return EXIT_SUCCESS;
 }
+
+//===================End Programm Functions===================
+void end_programm(tList * file_data_list, tList * list_compared_pictures){
+    int i;
+
+    //Delete all file datas
+    tList_Element * current_element = file_data_list->first_element;
+    for(i = 0; i < file_data_list->size; i++){
+        //Delete the tFile_data->data first
+        free(((tFile_data *) current_element->item)->data);
+        if(current_element->next_element != NULL){
+            current_element = current_element->next_element;
+        }
+    }
+    //Now delete the whole list
+    delete_list(file_data_list);
+
+    //Delete all macro block data of compared pictures
+    current_element = list_compared_pictures->first_element;
+    for(i = 0; i < list_compared_pictures->size; i++){
+        delete_list((tList *) current_element->item);
+        if(current_element->next_element != NULL){
+            current_element = current_element->next_element;
+        }
+    }
+
+    //Now delete the whole list (again)
+    delete_list(list_compared_pictures);
+}
