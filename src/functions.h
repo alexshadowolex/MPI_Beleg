@@ -8,9 +8,10 @@ typedef struct sFile_data{
 }tFile_data;
 
 typedef struct sPixel_data{
-    int red;
-    int green;
-    int blue;
+    char red;
+    char green;
+    char blue;
+    int initialized_correct;
 }tPixel_data;
 
 typedef struct sPixel_index{

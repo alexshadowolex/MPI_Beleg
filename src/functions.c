@@ -201,23 +201,16 @@ tPixel_data access_file_data_array(tFile_data * file, int x_width, int y_height)
 #ifdef TEST_ACCESS
     xprintf(("access_index = %i\n", access_index));
 #endif
-    unsigned char red_char = file->data[access_index + 0];
-    unsigned char green_char = file->data[access_index + 1];
-    unsigned char blue_char = file->data[access_index + 2];
-    int red = (int) red_char;
-    int green = (int) green_char;
-    int blue = (int) blue_char;
-    if(y_height >= file->height || x_width >= file->width){
-        red = -1;
-        green = -1;
-        blue = -1;
-    }
-
     tPixel_data ret_value = {
-        red,
-        green,
-        blue
+        (unsigned char) file->data[access_index + 0],
+        (unsigned char) file->data[access_index + 1],
+        (unsigned char) file->data[access_index + 2]
     };
+    if(y_height >= file->height || x_width >= file->width){
+        ret_value.initialized_correct = 0;
+    } else {
+        ret_value.initialized_correct = 1;
+    }
     return ret_value;
 }
 
@@ -336,18 +329,19 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
         int found_minimal_SAD = 0;
         //get_next_motion_vector will return values for the iteration
         //amount_motion_vectors is the amount of motion vectors that have to get tested
-        for(j = 0; j < amount_motion_vectors; j++){
+        for(j = 0; j < amount_motion_vectors && !found_minimal_SAD; j++){
             tPixel_index next_motion_vector = get_next_motion_vector(j);
             current_x_width_motion = next_motion_vector.x_width;
             current_y_height_motion = next_motion_vector.y_height;
             float current_SAD = 0;
+            int exceeded_minimal_sad = 0;
             //Calculate minimal SAD and save the value and the fitting distance motion vector
             //Iterate over all pixels in a macro block (SIZE_MACRO_BLOCK x SIZE_MACRO_BLOCK)
             for(x_current_width_macro_block = begin_index[0]; 
-                x_current_width_macro_block < begin_index[0] + SIZE_MACRO_BLOCK;
+                x_current_width_macro_block < begin_index[0] + SIZE_MACRO_BLOCK && !exceeded_minimal_sad;
                 x_current_width_macro_block++){
                 for(y_current_height_macro_block = begin_index[1]; 
-                    y_current_height_macro_block < begin_index[1] + SIZE_MACRO_BLOCK; 
+                    y_current_height_macro_block < begin_index[1] + SIZE_MACRO_BLOCK && !exceeded_minimal_sad; 
                     y_current_height_macro_block++){
                     
                     //Get current pixeldata from ref_picture
@@ -355,14 +349,23 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
                     //Get current pixeldata from other_picture, moved by current motion vector
                     tPixel_data other_pixel = access_file_data_array(other_picture, x_current_width_macro_block, y_current_height_macro_block);
 
-                    if(ref_pixel.red == - 1){
+                    if(!ref_pixel.initialized_correct){
                         //Means we tried to access a pixel outside of the picture
                         current_SAD += INT_MAX / 2;
                         continue;
                     }
-                    float ref_brightness = 0.30 * ref_pixel.red + 0.59 * ref_pixel.green + 0.11 * ref_pixel.blue;
-                    float other_brightness = 0.30 * other_pixel.red + 0.59 * other_pixel.green + 0.11 * other_pixel.blue;
-                    current_SAD += abs(ref_brightness - other_brightness);
+                    unsigned char ref_brightness = 0.30 * ref_pixel.red + 0.59 * ref_pixel.green + 0.11 * ref_pixel.blue;
+                    unsigned char other_brightness = 0.30 * other_pixel.red + 0.59 * other_pixel.green + 0.11 * other_pixel.blue;
+                    unsigned char value;
+                    if(ref_brightness >= other_brightness){
+                        value = ref_brightness - other_brightness;
+                    } else {
+                        value = other_brightness - ref_brightness;
+                    }
+                    current_SAD += (int) value;
+                    if(current_SAD > minimal_SAD){
+                        exceeded_minimal_sad = 1;
+                    }
                 }
             }
             //Comparing minimal sad with the current vector and minimal SAD
