@@ -56,5 +56,5 @@ Programmiersprachen: C, C++, MPI, (wahlweise MPI-Threads), stb-lib (zum lesen vo
 
 ### TODOS: 
 * SAD-Berechnung nicht in gecasteten ints, sondern in unsigned char -> <span style="color: green;">Erledigt</span>
-* Schreiben eines signed shorts für rgb mit echter differenz (auch negativ) (Struct mit signed shorts (sollte 6 byte sein)) ggf. mit dummy wert erweitern auf 8 byte, testen! -> <span style="color: red;">Offen</span>
+* Schreiben eines signed shorts für rgb mit echter differenz (auch negativ) (Struct mit signed shorts (sollte 6 byte sein)) ggf. mit dummy wert erweitern auf 8 byte, testen! -> <span style="color: green;">Erledigt</span>
 * Abbruch für das Finden einer 0 als SAD-Wert und das Überschreiten des Minimalen SAD-Werts implementieren -> <span style="color: green;">Erledigt</span>

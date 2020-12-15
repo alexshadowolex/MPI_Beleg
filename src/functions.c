@@ -406,7 +406,6 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
 int encode_files(tList * file_data, tList * compared_pictures){
     //All data will be seperated by a single space character
     int i;
-    char space_character[] = " ";
     //Get the reference picture and data
     tFile_data * ref_picture = (tFile_data *) get_element(file_data, 0)->item;
 
@@ -423,7 +422,6 @@ int encode_files(tList * file_data, tList * compared_pictures){
         //Write the amount of macroblocks to the file
         int amount_macro_blocks = get_amount_macro_blocks(current_picture);
         fwrite(&amount_macro_blocks, sizeof(int), 1, file);
-        fwrite(space_character, sizeof(char), 1, file);
 
         //Get all macro blocks data
         tList * current_all_macro_blocks = (tList *) get_element(compared_pictures, i)->item;
@@ -435,16 +433,13 @@ int encode_files(tList * file_data, tList * compared_pictures){
 
             fwrite(&current_motion_vector.x_width, sizeof(int), 1, file);
             fwrite(&current_motion_vector.y_height, sizeof(int), 1, file);
-            // fwrite(space_character, sizeof(char), 1, file);
         }
-        xprintf(("Wrote motion vectors\n"));
+        xprintf(("Wrote motion vectors %i\n", sizeof(tEncode_pixel_data)));
 
         //Write all decoded data
         int iterator_macro_blocks;
         for(iterator_macro_blocks = 0; iterator_macro_blocks < current_all_macro_blocks->size; iterator_macro_blocks++){
             tMacro_Block_SAD * tmp_block_info = (tMacro_Block_SAD *) get_element(current_all_macro_blocks, iterator_macro_blocks)->item;
-            //TODO: How is this happening.. int difference, cast back to unsigned char?
-            //TODO: How are negative differences handled. With abs()? And what about decoding it?
             tPixel_index motion_vector = tmp_block_info->motion_vector;
             int begin_macro_block[2];
             get_macro_block_begin(current_picture, iterator_macro_blocks, begin_macro_block);
@@ -455,20 +450,20 @@ int encode_files(tList * file_data, tList * compared_pictures){
                     tPixel_data tmp_current_data = access_file_data_array(current_picture, width, height);
                     tPixel_data tmp_ref_data = access_file_data_array(ref_picture, width + motion_vector.x_width, height + motion_vector.y_height);
                     
-                    //Differenz in signed shorts
-                    tPixel_data resulting_data = {
-                        abs(tmp_current_data.red - tmp_ref_data.red),
-                        abs(tmp_current_data.green - tmp_ref_data.green),
-                        abs(tmp_current_data.blue - tmp_ref_data.blue)
-                    };
-                    unsigned char write_red[] = {(char) resulting_data.red};
-                    unsigned char write_green[] = {(char) resulting_data.green};
-                    unsigned char write_blue[] = {(char) resulting_data.blue};
-                    fwrite(write_red, sizeof(char), 1, file);
-                    fwrite(write_green, sizeof(char), 1, file);
-                    fwrite(write_blue, sizeof(char), 1, file);
-                    fwrite(space_character, sizeof(char), 1, file);
+                    //Getting the difference as a signed short
+                    //Difference is always ref_pixeld_data - encode_pixel_data
+                    signed short red_short = (signed short) (tmp_ref_data.red - tmp_current_data.red);
+                    signed short green_short = (signed short) (tmp_ref_data.green - tmp_current_data.green);
+                    signed short blue_short = (signed short) (tmp_ref_data.blue - tmp_current_data.blue);
+
+                    tEncode_pixel_data * resulting_data = malloc(sizeof(tEncode_pixel_data));
+                    resulting_data->red = red_short;
+                    resulting_data->green = green_short;
+                    resulting_data->blue = blue_short;
+
+                    fwrite(resulting_data, sizeof(tEncode_pixel_data), 1, file);
                     
+                    free(resulting_data);
                 }
             }
         }

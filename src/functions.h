@@ -14,6 +14,13 @@ typedef struct sPixel_data{
     int initialized_correct;
 }tPixel_data;
 
+typedef struct sEncode_pixel_data{
+    signed short red;
+    signed short green;
+    signed short blue;
+    signed short dummy; //just to have short size of 8 instead of 6 byte
+}tEncode_pixel_data;
+
 typedef struct sPixel_index{
     int x_width;
     int y_height;
