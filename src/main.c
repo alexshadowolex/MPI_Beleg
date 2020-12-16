@@ -33,6 +33,8 @@ int main(int argc, char ** argv){
 
     time_printf(("Starting to calculate the motion vectors\n"));
     for(i = 0; i < amount_files - 1; i++){
+        char * file_name = ((tFile_data *) get_element(file_data_list, i + 1)->item)->file_name;
+        time_printf(("Calculating motionvectors for number %i; picture-name: %s\n", (i + 1), file_name));
         append_element(
             list_compared_pictures, 
             calc_SAD_values(
