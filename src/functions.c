@@ -413,8 +413,8 @@ int encode_files(tList * file_data, tList * compared_pictures){
         //Get the current picture to encode
         tFile_data * current_picture = (tFile_data *) get_element(file_data, i + 1)->item;
 
-        char file_name[strlen(current_picture->file_name) +  + 4];
-        memcpy(file_name, current_picture->file_name, strlen(current_picture->file_name));
+        char file_name[strlen(current_picture->file_name) + 4];
+        strcpy(file_name, current_picture->file_name);
         strcat(file_name, ".bpg");
         xprintf(("file_name: %s\n", file_name));
         FILE * file = fopen(file_name, "w+");
