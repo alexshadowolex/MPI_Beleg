@@ -7,13 +7,18 @@ int main(int argc, char ** argv){
     // float hdr_data[200][200][3];
 
     if(argc <= 3){
-        time_printf(("Not enough args! Usage: %s <distanze_motion_vector_seatch> <ref_picture> <picture 1> (optional: more picturesult)\n", argv[0]));
+        time_printf(("Not enough args! Usage: %s <distanze_motion_vector_search> <ref_picture> <picture 1> (optional: more picturesult)\n", argv[0]));
         exit(EXIT_FAILURE);
     }
 
     int i;
     int amount_files = argc - 2;
     int distanze_motion_vector_search = atoi(argv[1]);
+
+    if(distanze_motion_vector_search < 0){
+        time_printf(("Given distance for the motion vector search %i is not >= 0. Please provide a value greater or equal zero\n", distanze_motion_vector_search));
+        exit(EXIT_FAILURE);
+    }
     xprintf(("amount_files: %i\n\n", amount_files));
     tList * file_data_list = create_list();
 
@@ -53,6 +58,7 @@ int main(int argc, char ** argv){
         for(j = 0; j < tmp_output_list->size; j++){
             tMacro_Block_SAD * tmp_macro = (tMacro_Block_SAD *) get_element(tmp_output_list, j)->item;
             xprintf(("Block: %i; Vector: %i|%i; SAD-value: %f\n", j, tmp_macro->motion_vector.x_width, tmp_macro->motion_vector.y_height, tmp_macro->value_SAD));
+            
         }
 #endif
 

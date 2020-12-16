@@ -8,9 +8,9 @@ typedef struct sFile_data{
 }tFile_data;
 
 typedef struct sPixel_data{
-    char red;
-    char green;
-    char blue;
+    unsigned char red;
+    unsigned char green;
+    unsigned char blue;
     int initialized_correct;
 }tPixel_data;
 

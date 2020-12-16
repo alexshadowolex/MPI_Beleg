@@ -202,13 +202,16 @@ tPixel_data access_file_data_array(tFile_data * file, int x_width, int y_height)
     xprintf(("access_index = %i\n", access_index));
 #endif
     tPixel_data ret_value = {
-        (unsigned char) file->data[access_index + 0],
-        (unsigned char) file->data[access_index + 1],
-        (unsigned char) file->data[access_index + 2]
+        '0',
+        '0',
+        '0'
     };
-    if(y_height >= file->height || x_width >= file->width){
+    if(y_height >= file->height || x_width >= file->width || y_height < 0 || x_width < 0){
         ret_value.initialized_correct = 0;
     } else {
+        ret_value.red = (unsigned char) file->data[access_index + 0];
+        ret_value.green = (unsigned char) file->data[access_index + 1];
+        ret_value.blue = (unsigned char) file->data[access_index + 2];
         ret_value.initialized_correct = 1;
     }
     return ret_value;
@@ -315,9 +318,10 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
     int i, current_x_width_motion, current_y_height_motion, x_current_width_macro_block, y_current_height_macro_block;
     //for the distance 1, the amount is 9, for 2 it's 25 etc.
     int amount_motion_vectors = ((distanze_motion_vector_search * 2) + 1) * ((distanze_motion_vector_search * 2) + 1);
-// #ifdef TEST_SAD_CALC
+#ifdef TEST_SAD_CALC
     xprintf(("Distance motion vector: %i\n", distanze_motion_vector_search));
-// #endif
+    xprintf(("Amount motion vectors: %i\n", amount_motion_vectors));
+#endif
     for(i = 0; i < amount_macro_blocks; i++){
         //Compare all macro blocks
         int begin_index[2];
@@ -434,7 +438,7 @@ int encode_files(tList * file_data, tList * compared_pictures){
             fwrite(&current_motion_vector.x_width, sizeof(int), 1, file);
             fwrite(&current_motion_vector.y_height, sizeof(int), 1, file);
         }
-        xprintf(("Wrote motion vectors %i\n", sizeof(tEncode_pixel_data)));
+        xprintf(("Wrote motion vectors\n"));
 
         //Write all decoded data
         int iterator_macro_blocks;
