@@ -20,7 +20,7 @@ then
 fi
 
 #Compile the source
-gcc -omain src/main.c src/list.c src/functions.c -lm $DEBUG $MORE_DEBUG
+mpicc -omain src/main.c src/list.c src/functions.c -lm $DEBUG $MORE_DEBUG
 
 #Move binaries to bin-folder
 mv main bin
