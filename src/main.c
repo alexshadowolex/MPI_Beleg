@@ -4,7 +4,6 @@
 #include "functions.h"
 
 int main(int argc, char ** argv){
-    // float hdr_data[200][200][3];
 
     if(argc <= 3){
         time_printf(("Not enough args! Usage: %s <distanze_motion_vector_search> <ref_picture> <picture 1> (optional: more picturesult)\n", argv[0]));
