@@ -8,7 +8,7 @@ Before running the program, make sure the lib-folder exists with the fitting fil
 ## Compile
 Compile with<br>
 ```
-gcc -omain src/main.c src/list.c src/functions.c -lm; mv main bin
+mpicc -omain src/main.c src/list.c src/functions.c -lm; mv main bin
 ```
 or run <br>
 ```
@@ -16,7 +16,7 @@ or run <br>
 ```
 For Debug, compile with<br>
 ```
-gcc -omain src/main.c src/list.c src/functions.c -lm -DDEBUG; mv main bin
+mpicc -omain src/main.c src/list.c src/functions.c -lm -DDEBUG; mv main bin
 ```
 or run <br>
 ```
@@ -29,16 +29,18 @@ Compiling is possible with more options. Giving "DEBUG" and another argument (e.
 ## Run
 Run with<br>
 ```
-./bin/main <distanze_motion_vector_seatch> <picture1> <picture2>
+./bin/main <amount_processes> <distanze_motion_vector_seatch> <picture1> <picture2>
 ```
 Run with test-files<br>
 ```
-./bin/main 5 files/test_pictures/paint1.jpg files/test_pictures/paint2.jpg
+./bin/main <amount_processes> 5 files/test_pictures/paint1.jpg files/test_pictures/paint2.jpg
 ```
 or use (giving no picture args uses the test pictures)<br>
 ```
-./run.sh <distanze_motion_vector_seatch> <picture1> <picture2>
+./run.sh <amount_processes> <distanze_motion_vector_seatch> <picture1> <picture2>
 ```
+<br>
+Note that the argument "amount_processes" will only be used for running the mpiexec-command and is not an argument of the programm.
 
 
 ## Command line args
