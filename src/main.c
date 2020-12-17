@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "functions.h"
+#include <mpi.h>
 
 int main(int argc, char ** argv){
 
@@ -18,6 +19,8 @@ int main(int argc, char ** argv){
         time_printf(("Given distance for the motion vector search %i is not >= 0. Please provide a value greater or equal zero\n", distanze_motion_vector_search));
         exit(EXIT_FAILURE);
     }
+
+    MPI_Init(&argc, &argv);
     xprintf(("amount_files: %i\n\n", amount_files));
     tList * file_data_list = create_list();
 
@@ -110,6 +113,8 @@ int main(int argc, char ** argv){
     end_programm(file_data_list, list_compared_pictures);
 
     time_printf(("Finished freeing all maloced data\n"));
+
+    MPI_Finalize();
 
     time_printf(("Finished running the program!\n"));
 
