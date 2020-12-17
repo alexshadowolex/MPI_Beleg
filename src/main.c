@@ -2,7 +2,9 @@
 #include <stdio.h>
 #include <string.h>
 #include "functions.h"
-#include <mpi.h>
+#if __has_include(<mpi.h>)
+#   include <mpi.h>
+#endif
 
 int main(int argc, char ** argv){
 
