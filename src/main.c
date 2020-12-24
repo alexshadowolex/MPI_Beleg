@@ -32,7 +32,7 @@ int main(int argc, char ** argv){
         char * tmp_file_name = argv[i + 2];
         tFile_data * tmp_data = read_picture(tmp_file_name);
         time_printf(("Reading file %s finished!\n", tmp_data->file_name));
-        xprintf(("Data_size: %i | Picture_width: %i | Picture_Height: %i\n\n", (sizeof(tmp_data->data)), tmp_data->width, tmp_data->height));
+        xprintf(("Picture_width: %i | Picture_Height: %i\n\n", tmp_data->width, tmp_data->height));
         append_element(file_data_list, tmp_data);
     }
 
