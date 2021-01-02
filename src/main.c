@@ -178,7 +178,7 @@ int main(int argc, char ** argv){
 
     for(i = 0; i < time_evaluation_list->size; i++){
         tTime_evaluation * tmp = (tTime_evaluation *) get_element(time_evaluation_list, i)->item;
-        time_printf(("Time used for %-30s: %0.3f ms %20s\n", tmp->evaluation_for, tmp->time_difference, "= %0.3f s", (tmp->time_difference / 1000) ));
+        time_printf(("Time used for %-30s: %0.3f ms (= %0.3f s)\n", tmp->evaluation_for, tmp->time_difference, (tmp->time_difference / 1000) ));
     }
 
     exit(EXIT_SUCCESS);
