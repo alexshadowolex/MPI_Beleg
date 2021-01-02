@@ -125,7 +125,7 @@ int main(int argc, char ** argv){
 
     time_printf(("Finished running the program!\n"));
     gettimeofday(&total_end_time, NULL);
-    time_printf(("Total time used: %lu milli seconds\n", (total_end_time.tv_sec - total_start_time.tv_sec) * 1000000 + total_end_time.tv_usec - total_start_time.tv_usec));
+    time_printf(("Total time used: %lu milli seconds\n", (((long long)total_end_time.tv_sec)*1000)+(total_end_time.tv_usec/1000) - (((long long)total_start_time.tv_sec)*1000)+(total_start_time.tv_usec/1000) ));
 
     exit(EXIT_SUCCESS);
 }
