@@ -486,7 +486,7 @@ void add_to_evaluation_list(char * evaluation_for, struct timeval start, struct 
     xprintf(("Entering add_to_evaluation_list for: %s\ncalculated_difference: %f\n", evaluation_for, calculated_difference));
     tTime_evaluation * tmp_evaluation = malloc(sizeof(tTime_evaluation));
     xprintf(("Right before the if\n"));
-    if(calculated_difference == -1){
+    if(calculated_difference == -1.0){
         tmp_evaluation->time_difference = calculate_time_difference(start, end);
     } else {
         tmp_evaluation->time_difference = calculated_difference;
