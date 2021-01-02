@@ -183,8 +183,8 @@ tFile_data * read_picture(char * file_name){
 
 #endif
         tmp = malloc(sizeof(tFile_data));
-        //TODO malloc for char *!
-        tmp->file_name = file_name;
+        tmp->file_name = malloc(strlen(file_name));
+        strcpy(tmp->file_name, file_name); 
         tmp->data = (char *) malloc((height - 1) * width * 4 + (width - 1) * 4 + 2);
         memcpy(tmp->data, data, (height - 1) * width * 4 + (width - 1) * 4 + 2);
         tmp->height = height; 
@@ -359,8 +359,8 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
                         current_SAD += INT_MAX / 2;
                         continue;
                     }
-                    unsigned char ref_brightness = (unsigned char) ((30 * ref_pixel.red + 59 * ref_pixel.green + 11 * ref_pixel.blue) / 100);
-                    unsigned char other_brightness = (unsigned char) ((30 * other_pixel.red + 59 * other_pixel.green + 11 * other_pixel.blue) / 100);
+                    unsigned char ref_brightness = 0.30 * ref_pixel.red + 0.59 * ref_pixel.green + 0.11 * ref_pixel.blue;
+                    unsigned char other_brightness = 0.30 * other_pixel.red + 0.59 * other_pixel.green + 0.11 * other_pixel.blue;
                     unsigned char value;
                     if(ref_brightness >= other_brightness){
                         value = ref_brightness - other_brightness;
@@ -486,7 +486,7 @@ void end_programm(tList * file_data_list, tList * list_compared_pictures){
     for(i = 0; i < file_data_list->size; i++){
         //Delete the tFile_data->data first
         free(((tFile_data *) current_element->item)->data);
-        //TODO Free file name here
+        free(((tFile_data *) current_element->item)->file_name);
         if(current_element->next_element != NULL){
             current_element = current_element->next_element;
         }
