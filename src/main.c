@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <time.h>
+#include <sys/time.h>
 #include "functions.h"
 #if __has_include(<mpi.h>)
 #   include <mpi.h>
