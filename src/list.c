@@ -6,6 +6,8 @@ tList * create_list(void){
     tList * list = malloc(sizeof(tList));
     list->first_element = NULL;
     list->size = 0;
+    
+    return list;
 }
 
 
@@ -28,21 +30,21 @@ tList_Element * get_element(tList * list, int index){
 }
 
 void append_element(tList * list, void * new_item){
-<<<<<<< HEAD
-    tList_Element * element = malloc(sizeof(tList_Element));
-=======
     printf("Entered append function\nList: %s\n", list);
-    tList_Element * element = malloc(sizeof(tList_Element));
+    tList_Element * element = (tList_Element *) malloc(sizeof(tList_Element));
     printf("After malloc\n");
->>>>>>> parent of 20c1f80 (Trying all possible fixes now)
     element->item = new_item;
+    printf("After element->item\n");
     element->next_element = NULL;
+    printf("Works till list->size\n");
+    printf("List size: %i\n", list->size);
     if(list->size == 0){
         list->first_element = element;
     } else {
         tList_Element * tmp_last = get_element(list, list->size - 1);
         tmp_last->next_element = element;
     }
+    printf("Appended element perfectly\n");
     list->size++;
 }
 
