@@ -47,7 +47,7 @@ int main(int argc, char ** argv){
     gettimeofday(&read_end_time, NULL);
     tTime_evaluation * tmp_read_evaluation = malloc(sizeof(tTime_evaluation));
     tmp_read_evaluation->time_difference = calculate_time_difference(read_start_time, read_end_time);
-    tmp_read_evaluation->evaluation_for = "Read File Data";
+    tmp_read_evaluation->evaluation_for = "Reading File Data";
     append_element(time_evaluation_list, tmp_read_evaluation);
     time_printf(("Finished reading %i files\n", amount_files));
 
@@ -87,7 +87,7 @@ int main(int argc, char ** argv){
     gettimeofday(&calc_end_time, NULL);
     tTime_evaluation * tmp_calc_evaluation = malloc(sizeof(tTime_evaluation));
     tmp_calc_evaluation->time_difference = calculate_time_difference(calc_start_time, calc_end_time);
-    tmp_read_evaluation->evaluation_for = "Calculating Motion Vectors";
+    tmp_calc_evaluation->evaluation_for = "Calculating Motion Vectors";
     append_element(time_evaluation_list, tmp_calc_evaluation);
     time_printf(("Finished calculating the motion vectors\n"));
 
@@ -178,7 +178,7 @@ int main(int argc, char ** argv){
 
     for(i = 0; i < time_evaluation_list->size; i++){
         tTime_evaluation * tmp = (tTime_evaluation *) get_element(time_evaluation_list, i)->item;
-        time_printf(("Time used for \"%s\": %0.3f ms\n", tmp->evaluation_for, tmp->time_difference));
+        time_printf(("Time used for \"%s\"\t\t\t: %0.3f ms\n", tmp->evaluation_for, tmp->time_difference));
     }
 
     exit(EXIT_SUCCESS);
