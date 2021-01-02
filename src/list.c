@@ -31,12 +31,14 @@ void append_element(tList * list, void * new_item){
     tList_Element * element = malloc(sizeof(tList_Element));
     element->item = new_item;
     element->next_element = NULL;
+    printf("List size: %i\n", list->size);
     if(list->size == 0){
         list->first_element = element;
     } else {
         tList_Element * tmp_last = get_element(list, list->size - 1);
         tmp_last->next_element = element;
     }
+    printf("Appended element perfectly\n");
     list->size++;
 }
 
