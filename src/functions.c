@@ -482,7 +482,7 @@ double calculate_time_difference(struct timeval start_time, struct timeval end_t
     return ((end_time.tv_sec - start_time.tv_sec) * 1000000 + end_time.tv_usec - start_time.tv_usec) / 1000.0;
 }
 
-void add_to_evaluation_list(char * evaluation_for, struct timeval start, struct timeval end, double calculated_difference){
+void add_to_evaluation_list(tList * evaluation_list, char * evaluation_for, struct timeval start, struct timeval end, double calculated_difference){
     xprintf(("Entering add_to_evaluation_list for: %s\ncalculated_difference: %f\n", evaluation_for, calculated_difference));
     tTime_evaluation * tmp_evaluation = malloc(sizeof(tTime_evaluation));
     xprintf(("Right before the if\n"));
@@ -494,7 +494,7 @@ void add_to_evaluation_list(char * evaluation_for, struct timeval start, struct 
     xprintf(("Right after the if\n"));
     strcpy(tmp_evaluation->evaluation_for, evaluation_for);
     xprintf(("Copied the name\nList: %s\n", time_evaluation_list));
-    append_element(time_evaluation_list, tmp_evaluation);
+    append_element(evaluation_list, tmp_evaluation);
     xprintf(("Appended the element\n"));
 }
 
