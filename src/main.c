@@ -1,12 +1,16 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 #include "functions.h"
 #if __has_include(<mpi.h>)
 #   include <mpi.h>
 #endif
 
 int main(int argc, char ** argv){
+
+    time_t total_start_time;
+    time(&total_start_time);
 
     if(argc <= 3){
         time_printf(("Not enough args! Usage: %s <distanze_motion_vector_search> <ref_picture> <picture 1> (optional: more picturesult)\n", argv[0]));
@@ -119,6 +123,9 @@ int main(int argc, char ** argv){
     MPI_Finalize();
 
     time_printf(("Finished running the program!\n"));
+    time_t total_end_time;
+    time(&total_end_time);
+    time_printf(("Total time used: %f\n", difftime(total_end_time, total_start_time)));
 
     exit(EXIT_SUCCESS);
 }
