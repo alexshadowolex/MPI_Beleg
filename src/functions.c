@@ -482,6 +482,17 @@ double calculate_time_difference(struct timeval start_time, struct timeval end_t
     return ((end_time.tv_sec - start_time.tv_sec) * 1000000 + end_time.tv_usec - start_time.tv_usec) / 1000.0;
 }
 
+void add_to_evaluation_list(char * evaluation_for, struct timeval start, struct timeval end, double calculated_difference){
+    tTime_evaluation * tmp_evaluation = malloc(sizeof(tTime_evaluation));
+    if(calculated_difference == -1){
+        tmp_evaluation->time_difference = calculate_time_difference(start, end);
+    } else {
+        tmp_evaluation->time_difference = calculated_difference;
+    }
+    strcpy(tmp_evaluation->evaluation_for, evaluation_for);
+    append_element(time_evaluation_list, tmp_evaluation);
+}
+
 //===================End Programm Functions===================
 void end_programm(tList * file_data_list, tList * list_compared_pictures){
     int i;
