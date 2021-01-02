@@ -485,13 +485,19 @@ double calculate_time_difference(struct timeval start_time, struct timeval end_t
 void add_to_evaluation_list(char * evaluation_for, struct timeval start, struct timeval end, double calculated_difference){
     xprintf(("Adding for: %s\n", evaluation_for));
     tTime_evaluation * tmp_evaluation = malloc(sizeof(tTime_evaluation));
+    xprintf(("Before if\n"));
     if(calculated_difference == -1.0){
+        xprintf(("In first if\n"));
         tmp_evaluation->time_difference = calculate_time_difference(start, end);
     } else {
+        xprintf(("In second if\n"));
         tmp_evaluation->time_difference = calculated_difference;
     }
+    xprintf(("After if\n"));
     strcpy(tmp_evaluation->evaluation_for, evaluation_for);
+    xprintf(("After strcpy\n"));
     append_element(time_evaluation_list, tmp_evaluation);
+    xprintf(("After append\n"));
 }
 
 //===================End Programm Functions===================
