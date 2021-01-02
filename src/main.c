@@ -12,7 +12,7 @@ int main(int argc, char ** argv){
     struct timeval total_end_time, total_start_time;
     gettimeofday(&total_start_time, NULL);
 
-    time_evaluation_list = create_list();
+    tList * time_evaluation_list = create_list();
 
 
     if(argc <= 3){
@@ -45,7 +45,7 @@ int main(int argc, char ** argv){
         append_element(file_data_list, tmp_data);
     }
     gettimeofday(&read_end_time, NULL);
-    add_to_evaluation_list("Reading File Data", read_start_time, read_end_time, -1);
+    add_to_evaluation_list(time_evaluation_list, "Reading File Data", read_start_time, read_end_time, -1.0);
     time_printf(("Finished reading %i files\n", amount_files));
 
     //This list is holding lists of tMacro_Block_SAD. At index 0, file_data_list[0] and file_data_list[1] are compared, 
@@ -82,7 +82,7 @@ int main(int argc, char ** argv){
     }
 
     gettimeofday(&calc_end_time, NULL);
-    add_to_evaluation_list("Calculating Motion Vectors", calc_start_time, calc_end_time, -1);
+    add_to_evaluation_list(time_evaluation_list, "Calculating Motion Vectors", calc_start_time, calc_end_time, -1.0);
     time_printf(("Finished calculating the motion vectors\n"));
 
 #ifdef TEST_ACCESS
@@ -126,7 +126,7 @@ int main(int argc, char ** argv){
     }
     
     gettimeofday(&encode_end_time, NULL);
-    add_to_evaluation_list("Encoding Files", encode_start_time, encode_end_time, -1);
+    add_to_evaluation_list(time_evaluation_list, "Encoding Files", encode_start_time, encode_end_time, -1.0);
 
     time_printf(("Finished encoding all files\n"));
 
@@ -137,12 +137,8 @@ int main(int argc, char ** argv){
     end_programm(file_data_list, list_compared_pictures);
 
     gettimeofday(&ending_end_time, NULL);
-    add_to_evaluation_list("Ending Program", ending_start_time, ending_end_time, -1);
+    add_to_evaluation_list(time_evaluation_list, "Ending Program", ending_start_time, ending_end_time, -1.0);
     time_printf(("Finished freeing all maloced data\n"));
-
-    MPI_Finalize();
-
-    time_printf(("Finished running the program!\n\n"));
     
     gettimeofday(&total_end_time, NULL);
 
@@ -154,9 +150,9 @@ int main(int argc, char ** argv){
     
     tTime_evaluation * tmp_other_evaluation = malloc(sizeof(tTime_evaluation));
     
-    add_to_evaluation_list("Other", total_start_time, total_end_time, tmp_time_difference);
+    add_to_evaluation_list(time_evaluation_list, "Other", total_start_time, total_end_time, tmp_time_difference);
     
-    add_to_evaluation_list("Total Program", total_start_time, total_end_time, -1);
+    add_to_evaluation_list(time_evaluation_list, "Total Program", total_start_time, total_end_time, -1.0);
 
     time_printf(("Evaluating used time\n"));
 
@@ -165,6 +161,10 @@ int main(int argc, char ** argv){
         time_printf(("Time used for %-30s: %0.3f ms (= %0.3f s)\n", tmp->evaluation_for, tmp->time_difference, (tmp->time_difference / 1000) ));
     }
     delete_list(time_evaluation_list);
+
+    MPI_Finalize();
+
+    time_printf(("Finished running the program!\n\n"));
 
     exit(EXIT_SUCCESS);
 }
