@@ -37,6 +37,9 @@ void append_element(tList * list, void * new_item){
         list->first_element = element;
     } else {
         tList_Element * tmp_last = get_element(list, list->size - 1);
+        if(tmp_last == NULL){
+            return;
+        }
         tmp_last->next_element = element;
     }
     list->size++;
