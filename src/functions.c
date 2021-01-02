@@ -1,7 +1,7 @@
-#include "functions.h"
 #include <time.h>
 #include <stdio.h>
 #include <sys/time.h>
+#include "functions.h"
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "../lib/stb/stb_image_write.h"
