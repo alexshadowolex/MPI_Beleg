@@ -482,13 +482,13 @@ double calculate_time_difference(struct timeval start_time, struct timeval end_t
     return ((end_time.tv_sec - start_time.tv_sec) * 1000000 + end_time.tv_usec - start_time.tv_usec) / 1000.0;
 }
 
-void add_to_evaluation_list(char * evaluation_for, struct timeval start, struct timeval end, double calculated_difference){
+void add_to_evaluation_list(char * evaluation_for, struct timeval start_time, struct timeval end_time, double calculated_difference){
     xprintf(("Adding for: %s\nList->size: %i\n", evaluation_for, time_evaluation_list->size));
     tTime_evaluation * tmp_evaluation = malloc(sizeof(tTime_evaluation));
     xprintf(("Before if\n"));
     if(calculated_difference == -1.0){
         xprintf(("In first if\n"));
-        tmp_evaluation->time_difference = calculate_time_difference(start, end);
+        tmp_evaluation->time_difference = calculate_time_difference(start_time, end_time);
     } else {
         xprintf(("In second if\n"));
         tmp_evaluation->time_difference = calculated_difference;
