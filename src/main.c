@@ -9,8 +9,9 @@
 
 int main(int argc, char ** argv){
 
-    time_t total_start_time;
-    time(&total_start_time);
+    struct timeval total_end_time, total_start_time;
+    gettimeofday(&total_start_time, NULL);
+
 
     if(argc <= 3){
         time_printf(("Not enough args! Usage: %s <distanze_motion_vector_search> <ref_picture> <picture 1> (optional: more picturesult)\n", argv[0]));
@@ -123,9 +124,8 @@ int main(int argc, char ** argv){
     MPI_Finalize();
 
     time_printf(("Finished running the program!\n"));
-    time_t total_end_time;
-    time(&total_end_time);
-    time_printf(("Total time used: %f\n", difftime(total_end_time, total_start_time)));
+    gettimeofday(&total_end_time, NULL);
+    time_printf(("Total time used: %lu milli seconds\n", (total_end_time.tv_sec - total_start_time.tv_sec) * 1000000 + total_end_time.tv_usec - total_start_time.tv_usec));
 
     exit(EXIT_SUCCESS);
 }
