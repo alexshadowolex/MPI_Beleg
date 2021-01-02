@@ -31,6 +31,7 @@ void append_element(tList * list, void * new_item){
     tList_Element * element = malloc(sizeof(tList_Element));
     element->item = new_item;
     element->next_element = NULL;
+    printf("Works till list->size\n");
     printf("List size: %i\n", list->size);
     if(list->size == 0){
         list->first_element = element;
