@@ -493,7 +493,7 @@ void add_to_evaluation_list(char * evaluation_for, struct timeval start, struct 
     }
     xprintf(("Right after the if\n"));
     strcpy(tmp_evaluation->evaluation_for, evaluation_for);
-    xprintf(("Copied the name\n"));
+    xprintf(("Copied the name\nList: %s\n", time_evaluation_list));
     append_element(time_evaluation_list, tmp_evaluation);
     xprintf(("Appended the element\n"));
 }
