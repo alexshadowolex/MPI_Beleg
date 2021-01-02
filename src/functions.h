@@ -37,6 +37,8 @@ typedef struct sMacro_Block_SAD{
     tPixel_index motion_vector;
 }tMacro_Block_SAD;
 
+tList * time_evaluation_list;
+
 void print_timestamp(void);
 
 tFile_data * read_picture(char * file_name);
@@ -50,7 +52,7 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
 int encode_files(tList * file_data, tList * compared_pictures);
 
 double calculate_time_difference(struct timeval start_time, struct timeval end_time);
-void add_to_evaluation_list(tList * evaluation_list, char * evaluation_for, struct timeval start, struct timeval end, double calculated_difference);
+void add_to_evaluation_list(char * evaluation_for, struct timeval start, struct timeval end, double calculated_difference);
 
 void end_programm(tList * file_data_list, tList * list_compared_pictures);
 
