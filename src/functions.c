@@ -1,5 +1,4 @@
 #include "functions.h"
-#include "list.h"
 #include <time.h>
 #include <stdio.h>
 #include <sys/time.h>
