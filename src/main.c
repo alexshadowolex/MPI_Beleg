@@ -174,11 +174,11 @@ int main(int argc, char ** argv){
     
     append_element(time_evaluation_list, tmp_total_evaluation);
 
-    time_printf(("Evaluating used time"));
+    time_printf(("Evaluating used time\n"));
 
     for(i = 0; i < time_evaluation_list->size; i++){
         tTime_evaluation * tmp = (tTime_evaluation *) get_element(time_evaluation_list, i)->item;
-        time_printf(("Time used for \"%s\": %0.3f\n", tmp->evaluation_for, tmp->time_difference));
+        time_printf(("Time used for \"%s\": %0.3f ms\n", tmp->evaluation_for, tmp->time_difference));
     }
 
     exit(EXIT_SUCCESS);
