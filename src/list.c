@@ -38,6 +38,7 @@ void append_element(tList * list, void * new_item){
     } else {
         tList_Element * tmp_last = get_element(list, list->size - 1);
         if(tmp_last == NULL){
+            printf("The thing is actually NULL\n");
             return;
         }
         tmp_last->next_element = element;
