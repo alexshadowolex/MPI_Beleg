@@ -483,7 +483,7 @@ double calculate_time_difference(struct timeval start_time, struct timeval end_t
 }
 
 void add_to_evaluation_list(char * evaluation_for, struct timeval start, struct timeval end, double calculated_difference){
-    xprintf(("Adding for: %s\n", evaluation_for));
+    xprintf(("Adding for: %s\nList->size: %i\n", evaluation_for, time_evaluation_list->size));
     tTime_evaluation * tmp_evaluation = malloc(sizeof(tTime_evaluation));
     xprintf(("Before if\n"));
     if(calculated_difference == -1.0){
