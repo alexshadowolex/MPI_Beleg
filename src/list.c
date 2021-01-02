@@ -32,7 +32,9 @@ tList_Element * get_element(tList * list, int index){
 void append_element(tList * list, void * new_item){
     printf("Entered append function\nList: %s\n", list);
     tList_Element * element = malloc(sizeof(tList_Element));
+    printf("After malloc\n");
     element->item = new_item;
+    printf("After element->item\n");
     element->next_element = NULL;
     printf("Works till list->size\n");
     printf("List size: %i\n", list->size);
