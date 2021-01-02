@@ -6,6 +6,8 @@ tList * create_list(void){
     tList * list = malloc(sizeof(tList));
     list->first_element = NULL;
     list->size = 0;
+    
+    return list;
 }
 
 
