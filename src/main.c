@@ -45,7 +45,15 @@ int main(int argc, char ** argv){
         append_element(file_data_list, tmp_data);
     }
     gettimeofday(&read_end_time, NULL);
-    add_to_evaluation_list("Reading File Data", read_start_time, read_end_time, -1.0);
+    tTime_evaluation * tmp = malloc(sizeof(tTime_evaluation));
+    // if(-1.0 == -1.0){
+        tmp->time_difference = calculate_time_difference(read_start_time, read_end_time);
+    // } else {
+        // tmp->time_difference = calculated_difference;
+    // }
+    strcpy(tmp->evaluation_for, "Reading File Data");
+    append_element(time_evaluation_list, tmp);
+    // add_to_evaluation_list("Reading File Data", read_start_time, read_end_time, -1.0);
     time_printf(("Finished reading %i files\n", amount_files));
 
     //This list is holding lists of tMacro_Block_SAD. At index 0, file_data_list[0] and file_data_list[1] are compared, 
