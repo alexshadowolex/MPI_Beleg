@@ -1,3 +1,4 @@
+#include <sys/time.h>
 #include "list.h"
 
 typedef struct sFile_data{
@@ -26,6 +27,11 @@ typedef struct sPixel_index{
     int y_height;
 }tPixel_index;
 
+typedef struct sTime_evaluation{
+    double time_difference;
+    char * evaluation_for;
+}tTime_evaluation;
+
 typedef struct sMacro_Block_SAD{
     float value_SAD;
     tPixel_index motion_vector;
@@ -42,6 +48,8 @@ tPixel_index get_next_motion_vector(int iteration);
 tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, int distanze_motion_vector_search);
 
 int encode_files(tList * file_data, tList * compared_pictures);
+
+double calculate_time_difference(struct timeval start_time, struct timeval end_time);
 
 void end_programm(tList * file_data_list, tList * list_compared_pictures);
 

@@ -12,6 +12,8 @@ int main(int argc, char ** argv){
     struct timeval total_end_time, total_start_time;
     gettimeofday(&total_start_time, NULL);
 
+    tList * time_evaluation_list = create_list();
+
 
     if(argc <= 3){
         time_printf(("Not enough args! Usage: %s <distanze_motion_vector_search> <ref_picture> <picture 1> (optional: more picturesult)\n", argv[0]));
@@ -33,6 +35,8 @@ int main(int argc, char ** argv){
 
     //Get the file data and store it in an array
     time_printf(("Starting to read %i files\n", amount_files));
+    struct timeval read_start_time, read_end_time;
+    gettimeofday(&read_start_time, NULL);
     for (i = 0; i < amount_files; i++) {
         char * tmp_file_name = argv[i + 2];
         tFile_data * tmp_data = read_picture(tmp_file_name);
@@ -40,12 +44,20 @@ int main(int argc, char ** argv){
         xprintf(("Picture_width: %i | Picture_Height: %i\n\n", tmp_data->width, tmp_data->height));
         append_element(file_data_list, tmp_data);
     }
+    gettimeofday(&read_end_time, NULL);
+    tTime_evaluation * tmp_read_evaluation = malloc(sizeof(tTime_evaluation));
+    tmp_read_evaluation->time_difference = calculate_time_difference(read_start_time, read_end_time);
+    tmp_read_evaluation->evaluation_for = "Read File Data";
+    append_element(time_evaluation_list, tmp_read_evaluation);
+    time_printf(("Finished reading %i files\n", amount_files));
 
     //This list is holding lists of tMacro_Block_SAD. At index 0, file_data_list[0] and file_data_list[1] are compared, 
     //at index 1 file_data_list[0] and file_data_list[2] are compared etc.
     tList * list_compared_pictures = create_list();
 
     time_printf(("Starting to calculate the motion vectors\n"));
+    struct timeval calc_start_time, calc_end_time;
+    gettimeofday(&calc_start_time, NULL);
     for(i = 0; i < amount_files - 1; i++){
         char * file_name = ((tFile_data *) get_element(file_data_list, i + 1)->item)->file_name;
         time_printf(("Calculating motionvectors for number %i; picture-name: %s\n", (i + 1), file_name));
@@ -70,9 +82,13 @@ int main(int argc, char ** argv){
             
         }
 #endif
-
     }
 
+    gettimeofday(&calc_end_time, NULL);
+    tTime_evaluation * tmp_calc_evaluation = malloc(sizeof(tTime_evaluation));
+    tmp_calc_evaluation->time_difference = calculate_time_difference(calc_start_time, calc_end_time);
+    tmp_read_evaluation->evaluation_for = "Calculating Motion Vectors";
+    append_element(time_evaluation_list, tmp_calc_evaluation);
     time_printf(("Finished calculating the motion vectors\n"));
 
 #ifdef TEST_ACCESS
@@ -107,25 +123,63 @@ int main(int argc, char ** argv){
 #endif
 
     time_printf(("Starting to encode all files\n"));
+    struct timeval encode_start_time, encode_end_time;
+    gettimeofday(&encode_start_time, NULL);
 
     int ret_value = encode_files(file_data_list, list_compared_pictures);
     if(ret_value == EXIT_FAILURE){
         exit(EXIT_FAILURE);
     }
+    
+    gettimeofday(&encode_end_time, NULL);
+    tTime_evaluation * tmp_encode_evaluation = malloc(sizeof(tTime_evaluation));
+    tmp_encode_evaluation->time_difference = calculate_time_difference(encode_start_time, encode_end_time);
+    tmp_encode_evaluation->evaluation_for = "Encoding Files";
+    append_element(time_evaluation_list, tmp_encode_evaluation);
 
     time_printf(("Finished encoding all files\n"));
 
     time_printf(("Starting to free all maloced data\n"));
+    struct timeval ending_start_time, ending_end_time;
+    gettimeofday(&ending_start_time, NULL);
 
     end_programm(file_data_list, list_compared_pictures);
 
+    gettimeofday(&ending_end_time, NULL);
+    tTime_evaluation * tmp_ending_evaluation = malloc(sizeof(tTime_evaluation));
+    tmp_ending_evaluation->time_difference = calculate_time_difference(ending_start_time, ending_end_time);
+    tmp_ending_evaluation->evaluation_for = "Ending Program";
+    append_element(time_evaluation_list, tmp_ending_evaluation);
     time_printf(("Finished freeing all maloced data\n"));
 
     MPI_Finalize();
 
-    time_printf(("Finished running the program!\n"));
+    time_printf(("Finished running the program!\n\n"));
+    
     gettimeofday(&total_end_time, NULL);
-    time_printf(("Total time used: %lu milli seconds\n", (((long long)total_end_time.tv_sec)*1000)+(total_end_time.tv_usec/1000) - (((long long)total_start_time.tv_sec)*1000)+(total_start_time.tv_usec/1000) ));
+    tTime_evaluation * tmp_total_evaluation = malloc(sizeof(tTime_evaluation));
+    tmp_total_evaluation->time_difference = calculate_time_difference(total_start_time, total_end_time);
+    tmp_total_evaluation->evaluation_for = "Total Program";
+
+    double tmp_time_difference = 0.0;
+    for(i = 0; i < time_evaluation_list->size; i++){
+        tmp_time_difference += ((tTime_evaluation *) get_element(time_evaluation_list, i)->item)->time_difference;
+    }
+    tmp_time_difference = tmp_total_evaluation->time_difference - tmp_time_difference;
+    
+    tTime_evaluation * tmp_other_evaluation = malloc(sizeof(tTime_evaluation));
+    tmp_other_evaluation->time_difference = tmp_time_difference;
+    tmp_other_evaluation->evaluation_for = "Other";
+    append_element(time_evaluation_list, tmp_other_evaluation);
+    
+    append_element(time_evaluation_list, tmp_total_evaluation);
+
+    time_printf(("Evaluating used time"));
+
+    for(i = 0; i < time_evaluation_list->size; i++){
+        tTime_evaluation * tmp = (tTime_evaluation *) get_element(time_evaluation_list, i)->item;
+        time_printf(("Time used for \"%s\": %0.3f\n", tmp->evaluation_for, tmp->time_difference));
+    }
 
     exit(EXIT_SUCCESS);
 }

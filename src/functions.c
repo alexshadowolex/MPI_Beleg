@@ -477,6 +477,11 @@ int encode_files(tList * file_data, tList * compared_pictures){
     return EXIT_SUCCESS;
 }
 
+//===================Evaluation Functions===================
+double calculate_time_difference(struct timeval start_time, struct timeval end_time){
+    return ((end_time.tv_sec) * 1000 + (end_time.tv_usec) / 1000) - ((start_time.tv_sec) * 1000 + (start_time.tv_usec) / 1000);
+}
+
 //===================End Programm Functions===================
 void end_programm(tList * file_data_list, tList * list_compared_pictures){
     int i;
