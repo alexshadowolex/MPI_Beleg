@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#Runs the program without a machinefile
+#Runs the program with a machinefile attached
 
 #Check for args
 command_line_args=""
@@ -21,7 +21,7 @@ else
     #Run the program
     echo "Run program"
     
-    mpiexec -n $amount_processes ./bin/main $command_line_args
+    mpiexec -hostfile machinefile -n $amount_processes ./bin/main $command_line_args
     #Save the return-value
     ret=$?
     extra_message=""
