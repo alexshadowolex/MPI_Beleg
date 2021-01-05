@@ -34,6 +34,8 @@ int main(int argc, char ** argv){
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     
+    time_printf(("Amount Processes: %i\n", size));
+
     if(size <= 0){
         time_printf(("Amount of processes is %i, should be >= 1!\n", size));
         exit(EXIT_FAILURE);
