@@ -38,6 +38,7 @@ typedef struct sMacro_Block_SAD{
 }tMacro_Block_SAD;
 
 tList * time_evaluation_list;
+int rank;
 
 void print_timestamp(void);
 
@@ -46,8 +47,9 @@ tPixel_data access_file_data_array(tFile_data * file, int width, int height);
 int get_amount_macro_blocks(tFile_data * ref_picture);
 
 void get_macro_block_begin(tFile_data * ref_picture, int number_macro_block, int index[]);
+int get_amount_motion_vectors(int distance_motion_vector);
 tPixel_index get_next_motion_vector(int iteration);
-tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, int distanze_motion_vector_search);
+tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, int distanze_motion_vector_search, int range_start, int range_end);
 
 int encode_files(tList * file_data, tList * compared_pictures);
 
@@ -58,7 +60,7 @@ void end_programm(tList * file_data_list, tList * list_compared_pictures);
 
 #define SIZE_MACRO_BLOCK 16
 
-#define time_printf(x) if(rank == 0){print_timestamp(); printf x}
+#define time_printf(x) if(rank == 0){print_timestamp(); printf x;}
 
 #ifdef DEBUG
 #define xprintf(x) time_printf(x)

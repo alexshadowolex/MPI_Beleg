@@ -109,7 +109,6 @@ tFile_data * read_picture(char * file_name){
     int result;
     int width, height;
     int w2,h2,n2;
-    int tmp_height, tmp_width;
     int n;
     unsigned char * data;
     tFile_data * tmp;
@@ -136,32 +135,6 @@ tFile_data * read_picture(char * file_name){
     assert(result);
 
     if (data) {
-        char fname[512];
-        stb_splitpath(fname, file_name, STB_FILE);
-        /* 
-        stbi_write_png(stb_sprintf("output/%s.png", fname), width, height, 4, data, width*4);
-        stbi_write_bmp(stb_sprintf("output/%s.bmp", fname), width, height, 4, data);
-        stbi_write_tga(stb_sprintf("output/%s.tga", fname), width, height, 4, data);
-        */
-        stbi_write_jpg(stb_sprintf("output/%s_copy.jpg", fname), width, height, 4, data, 100);
-
-        xprintf(("File output for %s completed\n", file_name));
-
-        for (tmp_height = 0; tmp_height < height; tmp_height++ ){
-            for (tmp_width = 0; tmp_width < width; tmp_width++){
-                unsigned char red, green, blue;
-
-                red =   data[tmp_height * width * 4 + tmp_width * 4 + 0];
-                green = data[tmp_height * width * 4 + tmp_width * 4 + 1];
-                blue =  data[tmp_height * width * 4 + tmp_width * 4 + 2];
-
-                // xprintf(("Index: %i\n", (tmp_height * width * 4 + tmp_width * 4 + 2)));
-                // xprintf(("pixel %03d,%03d:  rgb: %03d,%03d,%03d \n", tmp_height, tmp_width, (int) red, (int) green, (int) blue));
-            }
-        }    
-        // xprintf(("Last index: %i\n", ((height - 1) * width * 4 + (width - 1) * 4 + 2))); 
-
-        xprintf(("Terminal output for %s completed\n", file_name));
 
 #ifdef X11_DISPLAY
         time_printf(("Showing picture on X11 display\n"));
@@ -245,6 +218,13 @@ void get_macro_block_begin(tFile_data * ref_picture, int number_macro_block, int
     index[1] = pixel_height;
 }
 
+int get_amount_motion_vectors(int distance_motion_vector){
+    if(distance_motion_vector < 0){
+        return -1;
+    }
+    return ((distance_motion_vector * 2) + 1) * ((distance_motion_vector * 2) + 1);
+}
+
 //Gets next motion vector as snail like iteration through all possibilities
 tPixel_index get_next_motion_vector(int iteration){
     int tmp_x;
@@ -264,7 +244,7 @@ tPixel_index get_next_motion_vector(int iteration){
         tmp_y = 0;
     } else {
         //Substract all possible motion vectors that happened before our current distance
-        iteration -= (((current_distance - 1) * 2) + 1) * (((current_distance - 1) * 2) + 1);
+        iteration -= get_amount_motion_vectors(current_distance - 1);
         int tmp_iteration;
         int move_x;
         int move_y;
@@ -311,13 +291,13 @@ tPixel_index get_next_motion_vector(int iteration){
 }
 
 //Calculates the SAD values for all possible motion vectors for all macro blocks
-tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, int distanze_motion_vector_search){
+tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, int distanze_motion_vector_search, int range_start, int range_end){
     //The list holds for all macro blocks the best motion vector in a struct tMacro_Block_SAD
     tList * all_macro_block_SAD = create_list();
     int amount_macro_blocks = get_amount_macro_blocks(ref_picture);
     int i, current_x_width_motion, current_y_height_motion, x_current_width_macro_block, y_current_height_macro_block;
     //for the distance 1, the amount is 9, for 2 it's 25 etc.
-    int amount_motion_vectors = ((distanze_motion_vector_search * 2) + 1) * ((distanze_motion_vector_search * 2) + 1);
+    int amount_motion_vectors = get_amount_motion_vectors(distanze_motion_vector_search);
 #ifdef TEST_SAD_CALC
     xprintf(("Distance motion vector: %i\n", distanze_motion_vector_search));
     xprintf(("Amount motion vectors: %i\n", amount_motion_vectors));

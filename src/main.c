@@ -13,7 +13,7 @@ int main(int argc, char ** argv){
     gettimeofday(&total_start_time, NULL);
 
     MPI_Init(&argc, &argv);
-    int rank, size;
+    int size;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
 
@@ -42,7 +42,7 @@ int main(int argc, char ** argv){
     time_printf(("Starting to read %i files\n", amount_files));
     struct timeval read_start_time, read_end_time;
     gettimeofday(&read_start_time, NULL);
-    for (i = 0; i < amount_files; i++) {
+    for(i = 0; i < amount_files; i++) {
         char * tmp_file_name = argv[i + 2];
         tFile_data * tmp_data = read_picture(tmp_file_name);
         time_printf(("Reading file %s finished!\n", tmp_data->file_name));
@@ -68,7 +68,9 @@ int main(int argc, char ** argv){
             calc_SAD_values(
                 (tFile_data *) get_element(file_data_list, 0)->item,
                 (tFile_data *) get_element(file_data_list, i + 1)->item,
-                distanze_motion_vector_search
+                distanze_motion_vector_search,
+                0,
+                0
             )
         );
 #ifdef TEST_SAD_CALC_OUTPUT
@@ -164,8 +166,6 @@ int main(int argc, char ** argv){
         tmp_time_difference += ((tTime_evaluation *) get_element(time_evaluation_list, i)->item)->time_difference;
     }
     tmp_time_difference = calculate_time_difference(total_start_time, total_end_time) - tmp_time_difference;
-    
-    tTime_evaluation * tmp_other_evaluation = malloc(sizeof(tTime_evaluation));
     
     add_to_evaluation_list("Other", total_start_time, total_end_time, tmp_time_difference);
     
