@@ -30,6 +30,10 @@ int main(int argc, char ** argv){
     }
 
     MPI_Init(&argc, &argv);
+    int rank, size;
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+    xprintf(("I am %d of $d\n", rank, size));
     xprintf(("amount_files: %i\n\n", amount_files));
     tList * file_data_list = create_list();
 
