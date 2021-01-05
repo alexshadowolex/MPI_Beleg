@@ -13,9 +13,9 @@ int main(int argc, char ** argv){
     gettimeofday(&total_start_time, NULL);
 
     MPI_Init(&argc, &argv);
-    int size;
+    int amount_processes;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-    MPI_Comm_size(MPI_COMM_WORLD, &size);
+    MPI_Comm_size(MPI_COMM_WORLD, &amount_processes);
 
     if(argc <= 3){
         time_printf(("Not enough args! Usage: %s <distanze_motion_vector_search> <ref_picture> <picture 1> (optional: more picturesult)\n", argv[0]));
@@ -33,7 +33,7 @@ int main(int argc, char ** argv){
     
     time_evaluation_list = create_list();
     
-    time_printf(("Amount Processes: %i\n", size));
+    time_printf(("Amount Processes: %i\n", amount_processes));
 
     xprintf(("amount_files: %i\n\n", amount_files));
     tList * file_data_list = create_list();
@@ -60,32 +60,46 @@ int main(int argc, char ** argv){
     time_printf(("Starting to calculate the motion vectors\n"));
     struct timeval calc_start_time, calc_end_time;
     gettimeofday(&calc_start_time, NULL);
-    for(i = 0; i < amount_files - 1; i++){
-        char * file_name = ((tFile_data *) get_element(file_data_list, i + 1)->item)->file_name;
-        time_printf(("Calculating motionvectors for number %i; picture-name: %s\n", (i + 1), file_name));
-        append_element(
-            list_compared_pictures, 
-            calc_SAD_values(
-                (tFile_data *) get_element(file_data_list, 0)->item,
-                (tFile_data *) get_element(file_data_list, i + 1)->item,
-                distanze_motion_vector_search,
-                0,
-                0
-            )
-        );
-#ifdef TEST_SAD_CALC_OUTPUT
-        xprintf(("SAD values of vectors for macro blocks between %s and %s:\n", 
-            ((tFile_data *) get_element(file_data_list, 0)->item)->file_name, 
-            ((tFile_data *) get_element(file_data_list, i + 1)->item)->file_name 
-        ));
-        int j;
-        tList * tmp_output_list = (tList *) get_element(list_compared_pictures, i)->item;
-        for(j = 0; j < tmp_output_list->size; j++){
-            tMacro_Block_SAD * tmp_macro = (tMacro_Block_SAD *) get_element(tmp_output_list, j)->item;
-            xprintf(("Block: %i; Vector: %i|%i; SAD-value: %f\n", j, tmp_macro->motion_vector.x_width, tmp_macro->motion_vector.y_height, tmp_macro->value_SAD));
-            
+    int amount_motion_vectors = get_amount_motion_vectors(distanze_motion_vector_search);
+    if(rank == 0){
+        time_printf(("Waiting for data\n"));
+    } 
+    if(rank != 0 || amount_processes == 1) {
+        for(i = 0; i < amount_files - 1; i++){
+            int range[2];
+            range[0] = (amount_motion_vectors / (amount_processes - 1)) * (rank - 1);
+            if(rank == amount_processes - 1){
+                range[1] = amount_motion_vectors;
+            } else {
+                range[1] = (amount_motion_vectors / (amount_processes - 1)) * (rank);
+            }
+            xprintf(("Amount motion vectors: %i | Range for %i rank: %i-%i\n", amount_motion_vectors, rank, range[0], range[1]));
+            char * file_name = ((tFile_data *) get_element(file_data_list, i + 1)->item)->file_name;
+            time_printf(("Calculating motionvectors for number %i; picture-name: %s\n", (i + 1), file_name));
+            append_element(
+                list_compared_pictures, 
+                calc_SAD_values(
+                    (tFile_data *) get_element(file_data_list, 0)->item,
+                    (tFile_data *) get_element(file_data_list, i + 1)->item,
+                    distanze_motion_vector_search,
+                    0,
+                    0
+                )
+            );
+    #ifdef TEST_SAD_CALC_OUTPUT
+            xprintf(("SAD values of vectors for macro blocks between %s and %s:\n", 
+                ((tFile_data *) get_element(file_data_list, 0)->item)->file_name, 
+                ((tFile_data *) get_element(file_data_list, i + 1)->item)->file_name 
+            ));
+            int j;
+            tList * tmp_output_list = (tList *) get_element(list_compared_pictures, i)->item;
+            for(j = 0; j < tmp_output_list->size; j++){
+                tMacro_Block_SAD * tmp_macro = (tMacro_Block_SAD *) get_element(tmp_output_list, j)->item;
+                xprintf(("Block: %i; Vector: %i|%i; SAD-value: %f\n", j, tmp_macro->motion_vector.x_width, tmp_macro->motion_vector.y_height, tmp_macro->value_SAD));
+                
+            }
+    #endif
         }
-#endif
     }
 
     gettimeofday(&calc_end_time, NULL);
