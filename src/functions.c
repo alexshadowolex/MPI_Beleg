@@ -238,7 +238,7 @@ void get_range(int range[], int amount_motion_vectors){
             range[1] = (amount_motion_vectors / (amount_working_processes)) * (rank);
         }
     }
-    xprintf(("Amount motion vectors: %i | Range for %i rank: %i-%i\n", amount_motion_vectors, rank, range[0], range[1]));
+    printf("Amount motion vectors: %i | Range for %i rank: %i-%i\n", amount_motion_vectors, rank, range[0], range[1]);
 }
 
 //Gets next motion vector as snail like iteration through all possibilities

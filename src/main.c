@@ -155,7 +155,7 @@ int main(int argc, char ** argv){
     struct timeval ending_start_time, ending_end_time;
     gettimeofday(&ending_start_time, NULL);
 
-    end_programm(file_data_list, list_compared_pictures);
+    //end_programm(file_data_list, list_compared_pictures); //TODO: Remove comment later and fix end_programm
 
     gettimeofday(&ending_end_time, NULL);
     add_to_evaluation_list("Ending Program", ending_start_time, ending_end_time, -1.0);
