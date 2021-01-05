@@ -19,7 +19,7 @@ else
     #Run the program
     echo "Run program"
     # echo "mpiexec -n $amount_processes ./bin/main $command_line_args"
-    mpiexec -n $amount_processes ./bin/main $command_line_args
+    mpiexec -hostfile machinefile -n $amount_processes ./bin/main $command_line_args
     #Save the return-value
     ret=$?
     extra_message=""

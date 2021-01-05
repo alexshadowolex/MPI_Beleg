@@ -82,7 +82,6 @@ int main(int argc, char ** argv){
     }
 
     gettimeofday(&calc_end_time, NULL);
-    xprintf(("Before new function in main\nList->size: %i\n", time_evaluation_list->size));
     add_to_evaluation_list("Calculating Motion Vectors", calc_start_time, calc_end_time, -1.0);
     time_printf(("Finished calculating the motion vectors\n"));
 
