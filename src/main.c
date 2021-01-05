@@ -13,7 +13,6 @@ int main(int argc, char ** argv){
     gettimeofday(&total_start_time, NULL);
 
     MPI_Init(&argc, &argv);
-    int amount_processes;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &amount_processes);
 
@@ -60,24 +59,13 @@ int main(int argc, char ** argv){
     time_printf(("Starting to calculate the motion vectors\n"));
     struct timeval calc_start_time, calc_end_time;
     gettimeofday(&calc_start_time, NULL);
-    int amount_motion_vectors = get_amount_motion_vectors(distanze_motion_vector_search);
     if(rank == 0){
         time_printf(("Waiting for data\n"));
     } 
     if(rank != 0 || amount_processes == 1) {
         for(i = 0; i < amount_files - 1; i++){
             int range[2];
-            int amount_working_processes = amount_processes - 1;
-            if(amount_working_processes == 0){
-                amount_working_processes = 1;
-            }
-            range[0] = (amount_motion_vectors / (amount_working_processes)) * (rank - 1);
-            if(rank == amount_working_processes){
-                range[1] = amount_motion_vectors;
-            } else {
-                range[1] = (amount_motion_vectors / (amount_working_processes)) * (rank);
-            }
-            xprintf(("Amount motion vectors: %i | Range for %i rank: %i-%i\n", amount_motion_vectors, rank, range[0], range[1]));
+            get_range(range, get_amount_motion_vectors(distanze_motion_vector_search));
             char * file_name = ((tFile_data *) get_element(file_data_list, i + 1)->item)->file_name;
             time_printf(("Calculating motionvectors for number %i; picture-name: %s\n", (i + 1), file_name));
             append_element(

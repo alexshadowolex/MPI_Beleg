@@ -225,6 +225,22 @@ int get_amount_motion_vectors(int distance_motion_vector){
     return ((distance_motion_vector * 2) + 1) * ((distance_motion_vector * 2) + 1);
 }
 
+void get_range(int range[], int amount_motion_vectors){
+    int amount_working_processes = amount_processes - 1;
+    if(amount_working_processes == 0){
+        range[0] = 0;
+        range[1] = amount_motion_vectors;
+    } else {
+        range[0] = (amount_motion_vectors / (amount_working_processes)) * (rank - 1);
+        if(rank == amount_working_processes){
+            range[1] = amount_motion_vectors;
+        } else {
+            range[1] = (amount_motion_vectors / (amount_working_processes)) * (rank);
+        }
+    }
+    xprintf(("Amount motion vectors: %i | Range for %i rank: %i-%i\n", amount_motion_vectors, rank, range[0], range[1]));
+}
+
 //Gets next motion vector as snail like iteration through all possibilities
 tPixel_index get_next_motion_vector(int iteration){
     int tmp_x;
