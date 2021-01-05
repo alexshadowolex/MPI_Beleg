@@ -238,7 +238,6 @@ void get_range(int range[], int amount_motion_vectors){
             range[1] = (amount_motion_vectors / (amount_working_processes)) * (rank);
         }
     }
-    printf("Amount motion vectors: %i | Range for %i rank: %i-%i\n", amount_motion_vectors, rank, range[0], range[1]);
 }
 
 //Gets next motion vector as snail like iteration through all possibilities
@@ -311,26 +310,32 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
     //The list holds for all macro blocks the best motion vector in a struct tMacro_Block_SAD
     tList * all_macro_block_SAD = create_list();
     int amount_macro_blocks = get_amount_macro_blocks(ref_picture);
-    int i, current_x_width_motion, current_y_height_motion, x_current_width_macro_block, y_current_height_macro_block;
+    int current_macro_block, current_x_width_motion, current_y_height_motion, x_current_width_macro_block, y_current_height_macro_block;
     //for the distance 1, the amount is 9, for 2 it's 25 etc.
     int amount_motion_vectors = get_amount_motion_vectors(distanze_motion_vector_search);
 #ifdef TEST_SAD_CALC
     xprintf(("Distance motion vector: %i\n", distanze_motion_vector_search));
     xprintf(("Amount motion vectors: %i\n", amount_motion_vectors));
 #endif
-    for(i = 0; i < amount_macro_blocks; i++){
+    for(current_macro_block = 0; 
+        current_macro_block < amount_macro_blocks; 
+        current_macro_block++){
+
         //Compare all macro blocks
         int begin_index[2];
-        get_macro_block_begin(ref_picture, i, begin_index);
+        get_macro_block_begin(ref_picture, current_macro_block, begin_index);
         float minimal_SAD = INT_MAX;
         int x_width_motion;
         int y_height_motion;
-        int j;
+        int current_motion_vector_iteration;
         int found_minimal_SAD = 0;
         //get_next_motion_vector will return values for the iteration
         //amount_motion_vectors is the amount of motion vectors that have to get tested
-        for(j = 0; j < amount_motion_vectors && !found_minimal_SAD; j++){
-            tPixel_index next_motion_vector = get_next_motion_vector(j);
+        for(current_motion_vector_iteration = range_start; 
+            current_motion_vector_iteration < range_end && !found_minimal_SAD; 
+            current_motion_vector_iteration++){
+
+            tPixel_index next_motion_vector = get_next_motion_vector(current_motion_vector_iteration);
             current_x_width_motion = next_motion_vector.x_width;
             current_y_height_motion = next_motion_vector.y_height;
             float current_SAD = 0;

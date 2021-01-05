@@ -59,7 +59,7 @@ int main(int argc, char ** argv){
     time_printf(("Starting to calculate the motion vectors\n"));
     struct timeval calc_start_time, calc_end_time;
     gettimeofday(&calc_start_time, NULL);
-    if(rank == 0){
+    if(rank == 0 && amount_processes > 1){
         time_printf(("Waiting for data\n"));
     } 
     if(rank != 0 || amount_processes == 1) {
@@ -74,8 +74,8 @@ int main(int argc, char ** argv){
                     (tFile_data *) get_element(file_data_list, 0)->item,
                     (tFile_data *) get_element(file_data_list, i + 1)->item,
                     distanze_motion_vector_search,
-                    0,
-                    0
+                    range[0],
+                    range[1]
                 )
             );
     #ifdef TEST_SAD_CALC_OUTPUT
