@@ -183,13 +183,12 @@ tFile_data * read_picture(char * file_name){
 
 #endif
         tmp = malloc(sizeof(tFile_data));
-        tmp->file_name = malloc(strlen(file_name));
+        tmp->file_name = malloc(strlen(file_name) + 1);
         strcpy(tmp->file_name, file_name); 
-        tmp->data = (char *) malloc((height - 1) * width * 4 + (width - 1) * 4 + 2);
-        memcpy(tmp->data, data, (height - 1) * width * 4 + (width - 1) * 4 + 2);
+        tmp->data = malloc(height * width * 4);
+        memcpy(tmp->data, data, height * width * 4);
         tmp->height = height; 
         tmp->width = width;
-        // free(data);	    
 
     } else {
         time_printf(("Failed loading data on second try, picture %s\n", file_name));
@@ -203,9 +202,9 @@ tPixel_data access_file_data_array(tFile_data * file, int x_width, int y_height)
     xprintf(("access_index = %i\n", access_index));
 #endif
     tPixel_data ret_value = {
-        '0',
-        '0',
-        '0'
+        '\0',
+        '\0',
+        '\0'
     };
     if(y_height >= file->height || x_width >= file->width || y_height < 0 || x_width < 0){
         ret_value.initialized_correct = 0;
@@ -393,7 +392,7 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
         xprintf(("Current macro block: %i\nMotion Vector: x_width = %i, y_height = %i\nSAD-value: %f\n", i, x_width_motion, y_height_motion, minimal_SAD));
 #endif
         tPixel_index motion_vector = {x_width_motion, y_height_motion};
-        tMacro_Block_SAD * macro_block_SAD = (tMacro_Block_SAD *) malloc(sizeof(tMacro_Block_SAD));
+        tMacro_Block_SAD * macro_block_SAD = malloc(sizeof(tMacro_Block_SAD));
         macro_block_SAD->value_SAD = minimal_SAD;
         macro_block_SAD->motion_vector = motion_vector;
         append_element(all_macro_block_SAD, macro_block_SAD);
@@ -465,6 +464,7 @@ int encode_files(tList * file_data, tList * compared_pictures){
                     resulting_data->red = red_short;
                     resulting_data->green = green_short;
                     resulting_data->blue = blue_short;
+                    resulting_data->dummy = 0;
 
                     fwrite(resulting_data, sizeof(tEncode_pixel_data), 1, file);
                     
@@ -483,21 +483,15 @@ double calculate_time_difference(struct timeval start_time, struct timeval end_t
 }
 
 void add_to_evaluation_list(char * evaluation_for, struct timeval start_time, struct timeval end_time, double calculated_difference){
-    xprintf(("Adding for: %s\nList->size: %i\n", evaluation_for, time_evaluation_list->size));
     tTime_evaluation * tmp_evaluation = malloc(sizeof(tTime_evaluation));
-    xprintf(("Before if\n"));
     if(calculated_difference == -1.0){
-        xprintf(("In first if\n"));
         tmp_evaluation->time_difference = calculate_time_difference(start_time, end_time);
     } else {
-        xprintf(("In second if\n"));
         tmp_evaluation->time_difference = calculated_difference;
     }
-    xprintf(("After if\n"));
+    tmp_evaluation->evaluation_for = malloc(strlen(evaluation_for) + 1);
     strcpy(tmp_evaluation->evaluation_for, evaluation_for);
-    xprintf(("After strcpy\n"));
     append_element(time_evaluation_list, tmp_evaluation);
-    xprintf(("After append\n"));
 }
 
 //===================End Programm Functions===================
@@ -526,6 +520,12 @@ void end_programm(tList * file_data_list, tList * list_compared_pictures){
         }
     }
 
-    //Now delete the whole list (again)
-    delete_list(list_compared_pictures);
+    //Now delete the whole list (again). Using the function would free the (already freed) items again, which causes leaks
+    tList_Element * tmp_next_element = list_compared_pictures->first_element;
+    do{
+        tList_Element * tmp = tmp_next_element;
+        tmp_next_element = tmp->next_element;
+        free(tmp);
+    }while(tmp_next_element != NULL);
+    free(list_compared_pictures);
 }

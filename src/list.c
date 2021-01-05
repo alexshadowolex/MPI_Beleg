@@ -30,9 +30,8 @@ tList_Element * get_element(tList * list, int index){
 }
 
 void append_element(tList * list, void * new_item){
-    printf("Entered append function.\n");
     tList_Element * element = malloc(sizeof(tList_Element));
-    printf("Item: %s | List: %s\n", new_item, list);
+    
     element->item = new_item;
     element->next_element = NULL;
     if(list->size == 0){
@@ -48,20 +47,15 @@ void append_element(tList * list, void * new_item){
 }
 
 void delete_list(tList * list){
-    int i;
-    tList_Element * tmp_next_element;
-    for(i = 0; i < list->size - 1; i++){
-        tList_Element * current_element;
-        if(i == 0){
-            current_element = list->first_element;
-        } else {
-            current_element = tmp_next_element;
-        }
-        tmp_next_element = current_element->next_element;
-        free(current_element->item);
-        free(current_element);
+    tList_Element * tmp_next_element = list->first_element;
+    if(tmp_next_element == NULL){
+        return;
     }
-    free(tmp_next_element->item);
-    free(tmp_next_element);
+    do{
+        tList_Element * tmp = tmp_next_element;
+        tmp_next_element = tmp->next_element;
+        free(tmp->item);
+        free(tmp);
+    }while(tmp_next_element != NULL);
     free(list);
 }
