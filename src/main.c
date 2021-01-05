@@ -29,7 +29,7 @@ int main(int argc, char ** argv){
         exit(EXIT_FAILURE);
     }
 
-    // MPI_Init(&argc, &argv);
+    MPI_Init(&argc, &argv);
     xprintf(("amount_files: %i\n\n", amount_files));
     tList * file_data_list = create_list();
 
@@ -141,7 +141,7 @@ int main(int argc, char ** argv){
     add_to_evaluation_list("Ending Program", ending_start_time, ending_end_time, -1.0);
     time_printf(("Finished freeing all malloced data\n"));
 
-    // MPI_Finalize();
+    MPI_Finalize();
 
     time_printf(("Finished running the program!\n\n"));
     
