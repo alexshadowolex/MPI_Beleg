@@ -58,7 +58,7 @@ void end_programm(tList * file_data_list, tList * list_compared_pictures);
 
 #define SIZE_MACRO_BLOCK 16
 
-#define time_printf(x) print_timestamp(); printf x
+#define time_printf(x) if(rank == 0){print_timestamp(); printf x}
 
 #ifdef DEBUG
 #define xprintf(x) time_printf(x)
