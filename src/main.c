@@ -66,13 +66,13 @@ int main(int argc, char ** argv){
         for(iterator_files = 0; iterator_files < amount_files - 1; iterator_files++){
             int range[2];
             get_range(range, get_amount_motion_vectors(distanze_motion_vector_search));
-            char * file_name = ((tFile_data *) get_element(file_data_list, i + 1)->item)->file_name;
-            time_printf(("Calculating motionvectors for number %i; picture-name: %s\n", (i + 1), file_name));
+            char * file_name = ((tFile_data *) get_element(file_data_list, iterator_files + 1)->item)->file_name;
+            time_printf(("Calculating motionvectors for number %i; picture-name: %s\n", (iterator_files + 1), file_name));
             append_element(
                 list_compared_pictures, 
                 calc_SAD_values(
                     (tFile_data *) get_element(file_data_list, 0)->item,
-                    (tFile_data *) get_element(file_data_list, i + 1)->item,
+                    (tFile_data *) get_element(file_data_list, iterator_files + 1)->item,
                     distanze_motion_vector_search,
                     range[0],
                     range[1]
