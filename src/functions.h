@@ -40,6 +40,12 @@ typedef struct sMacro_Block_SAD{
     tPixel_index motion_vector;
 }tMacro_Block_SAD;
 
+typedef struct sTMP_Macro_Block_SAD{
+    float value_SAD;
+    int x_width;
+    int y_height;
+}tTMP_Macro_Block_SAD;
+
 MPI_Datatype MPI_tMacro_Block_SAD;
 
 tList * time_evaluation_list;
@@ -66,6 +72,7 @@ void add_to_evaluation_list(char * evaluation_for, struct timeval start, struct 
 void end_programm(tList * file_data_list, tList * list_compared_pictures);
 
 #define SIZE_MACRO_BLOCK 16
+#define MASTER_RANK 0
 
 #define time_printf(x) if(rank == 0){print_timestamp(); printf x;}
 
