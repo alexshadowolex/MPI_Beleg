@@ -61,7 +61,7 @@ int main(int argc, char ** argv){
     time_printf(("Starting to calculate the motion vectors\n"));
     struct timeval calc_start_time, calc_end_time;
     gettimeofday(&calc_start_time, NULL);
-    if(rank == MASTER_RANK && amount_processes > 1){
+    if(rank == MASTER_RANK ){
         int iterator_files;
         for(iterator_files = 0; iterator_files < amount_files - 1; iterator_files++){
             int iterator_macro_blocks;
@@ -93,8 +93,7 @@ int main(int argc, char ** argv){
             }
             append_element(list_compared_pictures, tmp_macro_block_list);
         }
-    } 
-    if(rank != MASTER_RANK || amount_processes == 1) {
+    } else {
         for(i = 0; i < amount_files - 1; i++){
             int range[2];
             get_range(range, get_amount_motion_vectors(distanze_motion_vector_search));
