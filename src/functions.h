@@ -39,8 +39,6 @@ typedef struct sMacro_Block_SAD{
 
 tList * time_evaluation_list;
 int rank, amount_processes;
-MPI_Datatype MPI_tList;
-MPI_Datatype MPI_tList_element;
 
 void print_timestamp(void);
 
