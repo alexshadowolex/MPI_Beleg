@@ -119,7 +119,7 @@ int main(int argc, char ** argv){
                 
                 MPI_Send(&buffer, 1, MPI_tMacro_Block_SAD, MASTER_RANK, iterator_macro_block, MPI_COMM_WORLD);
             }
-            delete_list(tmp_list);
+            // delete_list(tmp_list);
         }
     }
 
