@@ -75,13 +75,12 @@ int main(int argc, char ** argv){
                     // adjust the end_programm, so only MASTER_RANK's data gets free'd and the file_data_list from each rank
                     // TODO Seems to be working for everything except for 1 process
                     tTMP_Macro_Block_SAD buffer;
-                    MPI_Recv(&buffer, 1, MPI_tMacro_Block_SAD, MPI_ANY_SOURCE, iterator_macro_blocks, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-                    xprintf(("Buffer directly after receive: %i|%i", buffer.x_width, buffer.y_height));
+                    MPI_Recv(&buffer, 1, MPI_tMacro_Block_SAD, MPI_ANY_SOURCE, iterator_macro_blocks, MPI_COMM_WORLD, MPI_ANY_SOURCE);
+                    xprintf(("Buffer directly after receive: %i|%i\n", buffer.x_width, buffer.y_height));
                     if(buffer.value_SAD < current_minimal_SAD){
                         current_minimal_SAD = buffer.value_SAD;
                         current_best_motion_vector.x_width = buffer.x_width;
                         current_best_motion_vector.y_height = buffer.y_height;
-                        xprintf(("New var: %i|%i .... buffer: %i|%i\n", current_best_motion_vector.x_width, current_best_motion_vector.y_height, buffer.x_width, buffer.y_height));
                         if(current_minimal_SAD == 0){
                             break;
                         }
@@ -118,7 +117,6 @@ int main(int argc, char ** argv){
                 buffer.value_SAD = tmp->value_SAD;
                 buffer.x_width = tmp->motion_vector.x_width;
                 buffer.y_height = tmp->motion_vector.y_height;
-                printf("tmp old: %i|%i ... buffer new: %i|%i\n", tmp->motion_vector.x_width, tmp->motion_vector.y_height, buffer.x_width, buffer.y_height);
                 
                 MPI_Send(&buffer, 1, MPI_tMacro_Block_SAD, MASTER_RANK, iterator_macro_block, MPI_COMM_WORLD);
             }
