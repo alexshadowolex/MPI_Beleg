@@ -39,15 +39,19 @@ typedef struct sMacro_Block_SAD{
 
 tList * time_evaluation_list;
 int rank, amount_processes;
+MPI_Datatype MPI_tList;
+MPI_Datatype MPI_tList_element;
 
 void print_timestamp(void);
+
+void init_data_types(void);
 
 tFile_data * read_picture(char * file_name);
 tPixel_data access_file_data_array(tFile_data * file, int width, int height);
 int get_amount_macro_blocks(tFile_data * ref_picture);
 
 void get_macro_block_begin(tFile_data * ref_picture, int number_macro_block, int index[]);
-void get_range(int range[], int amount_motion_vectors);
+void get_range(int range[], int amount_macro_blocks);
 int get_amount_motion_vectors(int distance_motion_vector);
 tPixel_index get_next_motion_vector(int iteration);
 tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, int distanze_motion_vector_search, int range_start, int range_end);
