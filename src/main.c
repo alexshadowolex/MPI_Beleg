@@ -71,6 +71,7 @@ int main(int argc, char ** argv){
             for(iterate_amount_processes = 0; iterate_amount_processes < amount_processes - 1; iterate_amount_processes++){
                 //TODO get all lists for each macro block and compare them
                 // adjust the end_programm, so only MASTER_RANK's data gets free'd and the file_data_list from each rank
+                // TODO Seems to be working for everything except for 1 process
                 tTMP_Macro_Block_SAD buffer;
                 MPI_Recv(&buffer, 1, MPI_tMacro_Block_SAD, MPI_ANY_SOURCE, iterator_macro_blocks, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
                 if(buffer.value_SAD < current_minimal_SAD){
@@ -116,24 +117,30 @@ int main(int argc, char ** argv){
                 MPI_Send(&buffer, 1, MPI_tMacro_Block_SAD, MASTER_RANK, iterator_macro_block, MPI_COMM_WORLD);
             }
             delete_list(tmp_list);
+        }
+    }
 
-    #ifdef TEST_SAD_CALC_OUTPUT
+    gettimeofday(&calc_end_time, NULL);
+
+#ifdef TEST_SAD_CALC_OUTPUT
+    if(rank == MASTER_RANK){
+        int tmp_i;
+        for(tmp_i = 0; tmp_i < amount_files; tmp_i++){
             xprintf(("SAD values of vectors for macro blocks between %s and %s:\n", 
                 ((tFile_data *) get_element(file_data_list, 0)->item)->file_name, 
                 ((tFile_data *) get_element(file_data_list, i + 1)->item)->file_name 
             ));
             int j;
-            tList * tmp_output_list = (tList *) get_element(list_compared_pictures, i)->item;
+            tList * tmp_output_list = (tList *) get_element(list_compared_pictures, tmp_i)->item;
             for(j = 0; j < tmp_output_list->size; j++){
                 tMacro_Block_SAD * tmp_macro = (tMacro_Block_SAD *) get_element(tmp_output_list, j)->item;
                 xprintf(("Block: %i; Vector: %i|%i; SAD-value: %f\n", j, tmp_macro->motion_vector.x_width, tmp_macro->motion_vector.y_height, tmp_macro->value_SAD));
                 
             }
-    #endif
         }
     }
+#endif
 
-    gettimeofday(&calc_end_time, NULL);
     add_to_evaluation_list("Calculating Motion Vectors", calc_start_time, calc_end_time, -1.0);
     time_printf(("Finished calculating the motion vectors\n"));
 
