@@ -80,6 +80,7 @@ int main(int argc, char ** argv){
                         current_minimal_SAD = buffer.value_SAD;
                         current_best_motion_vector.x_width = buffer.x_width;
                         current_best_motion_vector.y_height = buffer.y_height;
+                        xprintf(("New var: %i|%i .... buffer: %i|%i\n", current_best_motion_vector.x_width, current_best_motion_vector.y_height, buffer.x_width, buffer.y_height));
                         if(current_minimal_SAD == 0){
                             break;
                         }
