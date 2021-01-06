@@ -50,7 +50,7 @@ void print_timestamp(void){
 void init_mpi_data_types(void){
     int macro_block_SAD_lenghts[3] = {1, 1, 1};
     MPI_Aint macro_block_SAD_displacements[3] = {0, sizeof(float), sizeof(float) + sizeof(int)};
-    MPI_Datatypes macro_block_SAD_types[3] = {MPI_FLOAT, MPI_INT, MPI_INT};
+    MPI_Datatype macro_block_SAD_types[3] = {MPI_FLOAT, MPI_INT, MPI_INT};
     
     MPI_Type_create_struct(1, macro_block_SAD_lenghts, macro_block_SAD_displacements, macro_block_SAD_types, &MPI_tMacro_Block_SAD);
     MPI_Type_commit(&MPI_tMacro_Block_SAD);
