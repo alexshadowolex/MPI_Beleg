@@ -117,6 +117,7 @@ int main(int argc, char ** argv){
                 buffer.value_SAD = tmp->value_SAD;
                 buffer.x_width = tmp->motion_vector.x_width;
                 buffer.y_height = tmp->motion_vector.y_height;
+                printf("tmp old: %i|%i ... buffer new: %i|%i\n", tmp->motion_vector.x_width, tmp->motion_vector.y_height, buffer.x_width, buffer.y_height);
                 
                 MPI_Send(&buffer, 1, MPI_tMacro_Block_SAD, MASTER_RANK, iterator_macro_block, MPI_COMM_WORLD);
             }
