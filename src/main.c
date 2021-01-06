@@ -75,7 +75,7 @@ int main(int argc, char ** argv){
                     // adjust the end_programm, so only MASTER_RANK's data gets free'd and the file_data_list from each rank
                     // TODO Seems to be working for everything except for 1 process
                     tTMP_Macro_Block_SAD buffer;
-                    MPI_Recv(&buffer, 1, MPI_tMacro_Block_SAD, MPI_ANY_SOURCE, iterator_macro_blocks, MPI_COMM_WORLD, MPI_ANY_SOURCE);
+                    MPI_Recv(&buffer, 1, MPI_tMacro_Block_SAD, MPI_ANY_SOURCE, iterator_macro_blocks, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
                     xprintf(("Buffer directly after receive: %i|%i\n", buffer.x_width, buffer.y_height));
                     if(buffer.value_SAD < current_minimal_SAD){
                         current_minimal_SAD = buffer.value_SAD;
