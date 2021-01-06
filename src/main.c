@@ -62,34 +62,37 @@ int main(int argc, char ** argv){
     struct timeval calc_start_time, calc_end_time;
     gettimeofday(&calc_start_time, NULL);
     if(rank == MASTER_RANK && amount_processes > 1){
-        int iterator_macro_blocks;
-        tList * tmp_macro_block_list = create_list();
-        for(iterator_macro_blocks = 0; iterator_macro_blocks < get_amount_macro_blocks((tFile_data *) get_element(file_data_list, 0)->item); iterator_macro_blocks++){
-            int iterate_amount_processes;
-            float current_minimal_SAD = __INT_MAX__ / 2;
-            tPixel_index current_best_motion_vector;
-            for(iterate_amount_processes = 0; iterate_amount_processes < amount_processes - 1; iterate_amount_processes++){
-                //TODO get all lists for each macro block and compare them
-                // adjust the end_programm, so only MASTER_RANK's data gets free'd and the file_data_list from each rank
-                // TODO Seems to be working for everything except for 1 process
-                tTMP_Macro_Block_SAD buffer;
-                MPI_Recv(&buffer, 1, MPI_tMacro_Block_SAD, MPI_ANY_SOURCE, iterator_macro_blocks, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-                if(buffer.value_SAD < current_minimal_SAD){
-                    current_minimal_SAD = buffer.value_SAD;
-                    current_best_motion_vector.x_width = buffer.x_width;
-                    current_best_motion_vector.y_height = buffer.y_height;
-                    if(current_minimal_SAD == 0){
-                        break;
+        int iterator_files;
+        for(iterator_files = 0; iterator_files < amount_files - 1; iterator_files++){
+            int iterator_macro_blocks;
+            tList * tmp_macro_block_list = create_list();
+            for(iterator_macro_blocks = 0; iterator_macro_blocks < get_amount_macro_blocks((tFile_data *) get_element(file_data_list, 0)->item); iterator_macro_blocks++){
+                int iterate_amount_processes;
+                float current_minimal_SAD = __INT_MAX__ / 2;
+                tPixel_index current_best_motion_vector;
+                for(iterate_amount_processes = 0; iterate_amount_processes < amount_processes - 1; iterate_amount_processes++){
+                    //TODO get all lists for each macro block and compare them
+                    // adjust the end_programm, so only MASTER_RANK's data gets free'd and the file_data_list from each rank
+                    // TODO Seems to be working for everything except for 1 process
+                    tTMP_Macro_Block_SAD buffer;
+                    MPI_Recv(&buffer, 1, MPI_tMacro_Block_SAD, MPI_ANY_SOURCE, iterator_macro_blocks, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+                    if(buffer.value_SAD < current_minimal_SAD){
+                        current_minimal_SAD = buffer.value_SAD;
+                        current_best_motion_vector.x_width = buffer.x_width;
+                        current_best_motion_vector.y_height = buffer.y_height;
+                        if(current_minimal_SAD == 0){
+                            break;
+                        }
                     }
                 }
-            }
-            tMacro_Block_SAD * tmp_new_entry = malloc(sizeof(tMacro_Block_SAD));
-            tmp_new_entry->motion_vector = current_best_motion_vector;
-            tmp_new_entry->value_SAD = current_minimal_SAD;
+                tMacro_Block_SAD * tmp_new_entry = malloc(sizeof(tMacro_Block_SAD));
+                tmp_new_entry->motion_vector = current_best_motion_vector;
+                tmp_new_entry->value_SAD = current_minimal_SAD;
 
-            append_element(tmp_macro_block_list, tmp_new_entry);
+                append_element(tmp_macro_block_list, tmp_new_entry);
+            }
+            append_element(list_compared_pictures, tmp_macro_block_list);
         }
-        append_element(list_compared_pictures, tmp_macro_block_list);
     } 
     if(rank != MASTER_RANK || amount_processes == 1) {
         for(i = 0; i < amount_files - 1; i++){
@@ -125,10 +128,10 @@ int main(int argc, char ** argv){
 #ifdef TEST_SAD_CALC_OUTPUT
     if(rank == MASTER_RANK){
         int tmp_i;
-        for(tmp_i = 0; tmp_i < amount_files; tmp_i++){
+        for(tmp_i = 0; tmp_i < amount_files - 1; tmp_i++){
             xprintf(("SAD values of vectors for macro blocks between %s and %s:\n", 
                 ((tFile_data *) get_element(file_data_list, 0)->item)->file_name, 
-                ((tFile_data *) get_element(file_data_list, i + 1)->item)->file_name 
+                ((tFile_data *) get_element(file_data_list, tmp_i + 1)->item)->file_name 
             ));
             int j;
             tList * tmp_output_list = (tList *) get_element(list_compared_pictures, tmp_i)->item;
