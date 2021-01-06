@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #Runs the program with a machinefile attached
-
+ 
 #Check for args
 command_line_args=""
 if [ -z "$1" ]
