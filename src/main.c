@@ -18,7 +18,7 @@ int main(int argc, char ** argv){
 
     if(argc <= 3){
         time_printf(("Not enough args! Usage: %s <distanze_motion_vector_search> <ref_picture> <picture 1> (optional: more picturesult)\n", argv[0]));
-        MPI_ABORT(MPI_COMM_WORLD ,EXIT_FAILURE);
+        MPI_Abort(MPI_COMM_WORLD ,EXIT_FAILURE);
     }
 
     int i;
@@ -27,7 +27,7 @@ int main(int argc, char ** argv){
 
     if(distanze_motion_vector_search < 0){
         time_printf(("Given distance for the motion vector search %i is not >= 0. Please provide a value greater or equal zero\n", distanze_motion_vector_search));
-        MPI_ABORT(MPI_COMM_WORLD ,EXIT_FAILURE);
+        MPI_Abort(MPI_COMM_WORLD ,EXIT_FAILURE);
     }
     
     time_evaluation_list = create_list();
@@ -153,7 +153,7 @@ int main(int argc, char ** argv){
         }
         delete_list(time_evaluation_list);
 
-        MPI_ABORT(MPI_COMM_WORLD ,EXIT_FAILURE);
+        MPI_Abort(MPI_COMM_WORLD ,EXIT_FAILURE);
     }
     
     gettimeofday(&encode_end_time, NULL);
