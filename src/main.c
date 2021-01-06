@@ -72,7 +72,7 @@ int main(int argc, char ** argv){
                 //TODO get all lists for each macro block and compare them
                 // adjust the end_programm, so only MASTER_RANK's data gets free'd and the file_data_list from each rank
                 tTMP_Macro_Block_SAD buffer;
-                MPI_Recv(&buffer, 1, MPI_tMacro_Block_SAD, MPI_ANY_SOURCE, iterator_macro_blocks, MPI_COMM_WORLD);
+                MPI_Recv(&buffer, 1, MPI_tMacro_Block_SAD, MPI_ANY_SOURCE, iterator_macro_blocks, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
                 if(buffer.value_SAD < current_minimal_SAD){
                     current_minimal_SAD = buffer.value_SAD;
                     current_best_motion_vector.x_width = buffer.x_width;
