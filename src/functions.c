@@ -44,10 +44,6 @@ void print_timestamp(void){
     printf("%s.%03d ", buffer, millisec);
 }
 
-void init_data_types(void){
-
-}
-
 //===================Reader Functions===================
 #ifdef X11_DISPLAY
 // #include    <../lib/X11/Xlib.h>
@@ -229,17 +225,17 @@ int get_amount_motion_vectors(int distance_motion_vector){
     return ((distance_motion_vector * 2) + 1) * ((distance_motion_vector * 2) + 1);
 }
 
-void get_range(int range[], int amount_macro_blocks){
+void get_range(int range[], int amount_motion_vectors){
     int amount_working_processes = amount_processes - 1;
     if(amount_working_processes == 0){
         range[0] = 0;
-        range[1] = amount_macro_blocks;
+        range[1] = amount_motion_vectors;
     } else {
-        range[0] = (amount_macro_blocks / (amount_working_processes)) * (rank - 1);
+        range[0] = (amount_motion_vectors / (amount_working_processes)) * (rank - 1);
         if(rank == amount_working_processes){
-            range[1] = amount_macro_blocks;
+            range[1] = amount_motion_vectors;
         } else {
-            range[1] = (amount_macro_blocks / (amount_working_processes)) * (rank);
+            range[1] = (amount_motion_vectors / (amount_working_processes)) * (rank);
         }
     }
 }
@@ -321,8 +317,8 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
     xprintf(("Distance motion vector: %i\n", distanze_motion_vector_search));
     xprintf(("Amount motion vectors: %i\n", amount_motion_vectors));
 #endif
-    for(current_macro_block = range_start; 
-        current_macro_block < range_end; 
+    for(current_macro_block = 0; 
+        current_macro_block < amount_macro_blocks; 
         current_macro_block++){
 
         //Compare all macro blocks
@@ -335,8 +331,8 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
         int found_minimal_SAD = 0;
         //get_next_motion_vector will return values for the iteration
         //amount_motion_vectors is the amount of motion vectors that have to get tested
-        for(current_motion_vector_iteration = 0; 
-            current_motion_vector_iteration < amount_motion_vectors && !found_minimal_SAD; 
+        for(current_motion_vector_iteration = range_start; 
+            current_motion_vector_iteration < range_end && !found_minimal_SAD; 
             current_motion_vector_iteration++){
 
             tPixel_index next_motion_vector = get_next_motion_vector(current_motion_vector_iteration);

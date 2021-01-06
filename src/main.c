@@ -29,8 +29,6 @@ int main(int argc, char ** argv){
         time_printf(("Given distance for the motion vector search %i is not >= 0. Please provide a value greater or equal zero\n", distanze_motion_vector_search));
         MPI_Abort(MPI_COMM_WORLD ,EXIT_FAILURE);
     }
-
-    init_data_types();
     
     time_evaluation_list = create_list();
     
@@ -77,7 +75,7 @@ int main(int argc, char ** argv){
     if(rank != 0 || amount_processes == 1) {
         for(i = 0; i < amount_files - 1; i++){
             int range[2];
-            get_range(range, get_amount_macro_blocks((tFile_data *) get_element(file_data_list, i + 1)->item));
+            get_range(range, get_amount_motion_vectors(distanze_motion_vector_search));
             char * file_name = ((tFile_data *) get_element(file_data_list, i + 1)->item)->file_name;
             time_printf(("Calculating motionvectors for number %i; picture-name: %s\n", (i + 1), file_name));
             append_element(
