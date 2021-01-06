@@ -40,10 +40,13 @@ typedef struct sMacro_Block_SAD{
     tPixel_index motion_vector;
 }tMacro_Block_SAD;
 
+MPI_Datatype MPI_tMacro_Block_SAD;
+
 tList * time_evaluation_list;
 int rank, amount_processes;
 
 void print_timestamp(void);
+void init_mpi_data_types(void);
 
 tFile_data * read_picture(char * file_name);
 tPixel_data access_file_data_array(tFile_data * file, int width, int height);

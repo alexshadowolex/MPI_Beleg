@@ -29,6 +29,8 @@ int main(int argc, char ** argv){
         time_printf(("Given distance for the motion vector search %i is not >= 0. Please provide a value greater or equal zero\n", distanze_motion_vector_search));
         MPI_Abort(MPI_COMM_WORLD ,EXIT_FAILURE);
     }
+
+    init_mpi_data_types();
     
     time_evaluation_list = create_list();
     
