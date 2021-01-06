@@ -403,7 +403,7 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
         }
         //Add vector for macro block here
 #ifdef TEST_SAD_CALC_TMP
-        printf("Current macro block: %i\nMotion Vector: x_width = %i, y_height = %i\nSAD-value: %f\n", i, x_width_motion, y_height_motion, minimal_SAD);
+        printf("Current macro block: %i\nMotion Vector: x_width = %i, y_height = %i\nSAD-value: %f\n", current_macro_block, x_width_motion, y_height_motion, minimal_SAD);
 #endif
         tPixel_index motion_vector = {x_width_motion, y_height_motion};
         tMacro_Block_SAD * macro_block_SAD = malloc(sizeof(tMacro_Block_SAD));
