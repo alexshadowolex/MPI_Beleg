@@ -2,6 +2,9 @@
 #include <stdio.h>
 #include <sys/time.h>
 #include "functions.h"
+#if __has_include(<mpi.h>)
+#   include <mpi.h>
+#endif
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "../lib/stb/stb_image_write.h"

@@ -1,5 +1,8 @@
 #include <sys/time.h>
 #include "list.h"
+#if __has_include(<mpi.h>)
+#   include <mpi.h>
+#endif
 
 typedef struct sFile_data{
     char * file_name;
