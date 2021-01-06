@@ -18,7 +18,7 @@ int main(int argc, char ** argv){
 
     if(argc <= 3){
         time_printf(("Not enough args! Usage: %s <distanze_motion_vector_search> <ref_picture> <picture 1> (optional: more picturesult)\n", argv[0]));
-        exit(EXIT_FAILURE);
+        MPI_ABORT(MPI_COMM_WORLD ,EXIT_FAILURE);
     }
 
     int i;
@@ -27,7 +27,7 @@ int main(int argc, char ** argv){
 
     if(distanze_motion_vector_search < 0){
         time_printf(("Given distance for the motion vector search %i is not >= 0. Please provide a value greater or equal zero\n", distanze_motion_vector_search));
-        exit(EXIT_FAILURE);
+        MPI_ABORT(MPI_COMM_WORLD ,EXIT_FAILURE);
     }
     
     time_evaluation_list = create_list();
@@ -60,7 +60,17 @@ int main(int argc, char ** argv){
     struct timeval calc_start_time, calc_end_time;
     gettimeofday(&calc_start_time, NULL);
     if(rank == 0 && amount_processes > 1){
-        time_printf(("Waiting for data\n"));
+        int iterate_macro_blocks;
+        for(iterate_macro_blocks = 0; iterate_macro_blocks < get_amount_macro_blocks((tFile_data *) get_element(file_data_list, 0)->item); iterate_macro_blocks++){
+            int iterate_amount_processes;
+            float current_minimal_SAD = __INT_MAX__ / 2;
+            for(iterate_amount_processes = 0; iterate_amount_processes < amount_processes - 1; iterate_amount_processes++){
+                //TODO get all lists for each macro block and compare them
+                // create to MPI-structs before (for list and list element)
+                // remove the append_element for the other processes 
+                // adjust the end_programm, so only rank == 0's data gets free'd and the file_data_list from each rank
+            }
+        }
     } 
     if(rank != 0 || amount_processes == 1) {
         for(i = 0; i < amount_files - 1; i++){
@@ -143,7 +153,7 @@ int main(int argc, char ** argv){
         }
         delete_list(time_evaluation_list);
 
-        exit(EXIT_FAILURE);
+        MPI_ABORT(MPI_COMM_WORLD ,EXIT_FAILURE);
     }
     
     gettimeofday(&encode_end_time, NULL);
