@@ -25,7 +25,7 @@
 // Globally used vars
 
 
-// Timestamp
+// Print a timestamp for Output
 void print_timestamp(void){
     char buffer[26];
     int millisec;
@@ -47,6 +47,7 @@ void print_timestamp(void){
     printf("%s.%03d ", buffer, millisec);
 }
 
+// Initialize datatypes used for mpi_send
 void init_mpi_data_types(void){
     int macro_block_SAD_lenghts[3] = {1, 1, 1};
     MPI_Aint macro_block_SAD_displacements[3] = {0, sizeof(float), sizeof(float) + sizeof(int)};
@@ -57,67 +58,8 @@ void init_mpi_data_types(void){
 }
 
 // ===================Reader Functions===================
-#ifdef X11_DISPLAY
-// #include    <../lib/X11/Xlib.h>
-XImage *CreateTrueColorImage(Display *display, Visual *visual, unsigned char *image, int width, int height, unsigned char *data){
-    int i, j;
-    unsigned char *image32=(unsigned char *)malloc(width*height*4);
-    unsigned char *p=image32;
-    for(i=0; i<width; i++){
-        for(j=0; j<height; j++){	    
-            *p++ = data[i*height*4+j*4+0];
-            *p++ = data[i*height*4+j*4+1];
-            *p++ = data[i*height*4+j*4+2];
-            *p++;
-        }
-    }
-    return XCreateImage(display, visual, 24, ZPixmap, 0, image32, width, height, 32, 0);
-}
-
-void processEvent(Display *display, Window window, XImage *ximage, int width, int height){
-    static char *tir="This is red";
-    static char *tig="This is green";
-    static char *tib="This is blue";
-    XEvent ev;
-    XNextEvent(display, &ev);
-    switch(ev.type)
-    {
-        case Expose:
-            XPutImage(display, window, DefaultGC(display, 0), ximage, 0, 0, 0, 0, width, height);
-            /* XSetForeground(display, DefaultGC(display, 0), 0x00ff0000); // red
-            XDrawString(display, window, DefaultGC(display, 0), 32,    32,    tir, strlen(tir));
-            XDrawString(display, window, DefaultGC(display, 0), 32+256, 32,    tir, strlen(tir));
-            XDrawString(display, window, DefaultGC(display, 0), 32+256, 32+256, tir, strlen(tir));
-            XDrawString(display, window, DefaultGC(display, 0), 32,    32+256, tir, strlen(tir));
-            XSetForeground(display, DefaultGC(display, 0), 0x0000ff00); // green
-            XDrawString(display, window, DefaultGC(display, 0), 32,    52,    tig, strlen(tig));
-            XDrawString(display, window, DefaultGC(display, 0), 32+256, 52,    tig, strlen(tig));
-            XDrawString(display, window, DefaultGC(display, 0), 32+256, 52+256, tig, strlen(tig));
-            XDrawString(display, window, DefaultGC(display, 0), 32,    52+256, tig, strlen(tig));
-            XSetForeground(display, DefaultGC(display, 0), 0x000000ff); // blue
-            XDrawString(display, window, DefaultGC(display, 0), 32,    72,    tib, strlen(tib));
-            XDrawString(display, window, DefaultGC(display, 0), 32+256, 72,    tib, strlen(tib));
-            XDrawString(display, window, DefaultGC(display, 0), 32+256, 72+256, tib, strlen(tib));
-            XDrawString(display, window, DefaultGC(display, 0), 32,    72+256, tib, strlen(tib));
-            */
-            break;
-        case ButtonPresults:
-            exit(EXIT_FAILURE);
-    }
-}
-
-#endif
-
-
-
+// Read the data of a jpg-File and return it as a tFile_data-struct
 tFile_data * read_picture(char * file_name){
-
-#ifdef X11_DISPLAY
-    XImage *ximage;
-    Display *display;
-    Visual *visual;
-    Window window;
-#endif
     int result;
     int width, height;
     int w2,h2,n2;
@@ -125,7 +67,6 @@ tFile_data * read_picture(char * file_name){
     unsigned char * data;
     tFile_data * tmp;
     result = stbi_info(file_name, &w2, &h2, &n2);
-    // xprintf(("stb_info(%s, &w2, &h2, &n2) --> w2:%d, h2:%d, n2:%d\n", file_name, w2, h2, n2));
 
     data = stbi_load(file_name, &width, &height, &n, 4); 
     if (data){ 
@@ -133,12 +74,6 @@ tFile_data * read_picture(char * file_name){
     } else {
         time_printf(("Failed loading data of picture %s\n", file_name));
     }
-    /*
-    data = stbi_load(file_name, &width, &height,  0, 1); if (data) free(data); else time_printf(("Failed 1\n"));
-    data = stbi_load(file_name, &width, &height,  0, 2); if (data) free(data); else time_printf(("Failed 2\n"));
-    data = stbi_load(file_name, &width, &height,  0, 3); if (data) free(data); else time_printf(("Failed 3\n"));
-    */
-
 
     // load image once again and check whether the same values are obtained 
     data = stbi_load(file_name, &width, &height, &n, 4);
@@ -147,26 +82,7 @@ tFile_data * read_picture(char * file_name){
     assert(result);
 
     if (data) {
-
-#ifdef X11_DISPLAY
-        time_printf(("Showing picture on X11 display\n"));
-
-        display=XOpenDisplay(NULL);
-        visual=DefaultVisual(display, 0);
-        window=XCreateSimpleWindow(display, RootWindow(display, 0), 0, 0, width, height, 1, 0, 0);
-        if(visual->class!=TrueColor){
-            fprintf(stderr, "Cannot handle non true color visual ...\n");
-            exit(EXIT_SUCCESS);
-        }
-
-        ximage=CreateTrueColorImage(display, visual, 0, width, height, data);
-        XSelectInput(display, window, ButtonPresultsMask|ExposureMask);
-        XMapWindow(display, window);
-        while(1){
-            processEvent(display, window, ximage, width, height);
-        }  
-
-#endif
+        // Store data in struct
         tmp = malloc(sizeof(tFile_data));
         tmp->file_name = malloc(strlen(file_name) + 1);
         strcpy(tmp->file_name, file_name); 
@@ -174,13 +90,13 @@ tFile_data * read_picture(char * file_name){
         memcpy(tmp->data, data, height * width * 4);
         tmp->height = height; 
         tmp->width = width;
-
     } else {
         time_printf(("Failed loading data on second try, picture %s\n", file_name));
     }
     return tmp;
 }
 
+// Simulate 2D-access onto the data-array and transform it into 1D-access
 tPixel_data access_file_data_array(tFile_data * file, int x_width, int y_height){
     int access_index = y_height * file->width * 4 + x_width * 4;
 #ifdef TEST_ACCESS
@@ -191,6 +107,7 @@ tPixel_data access_file_data_array(tFile_data * file, int x_width, int y_height)
         '\0',
         '\0'
     };
+    // if the index is out of bound, set the initialized_correct to false
     if(y_height >= file->height || x_width >= file->width || y_height < 0 || x_width < 0){
         ret_value.initialized_correct = 0;
     } else {
@@ -202,6 +119,7 @@ tPixel_data access_file_data_array(tFile_data * file, int x_width, int y_height)
     return ret_value;
 }
 
+// Return the amount of macro blocks in a picture
 int get_amount_macro_blocks(tFile_data * ref_picture){
     // Since every picture has an integer amount of macro blocks, the calculation is easy
     return (ref_picture->height / SIZE_MACRO_BLOCK) * (ref_picture->width / SIZE_MACRO_BLOCK);
@@ -230,6 +148,7 @@ void get_macro_block_begin(tFile_data * ref_picture, int number_macro_block, int
     index[1] = pixel_height;
 }
 
+// Calculate the given distance for motion vectors into the amount of all motion vectors inside the distance
 int get_amount_motion_vectors(int distance_motion_vector){
     if(distance_motion_vector < 0){
         return -1;
@@ -237,6 +156,7 @@ int get_amount_motion_vectors(int distance_motion_vector){
     return ((distance_motion_vector * 2) + 1) * ((distance_motion_vector * 2) + 1);
 }
 
+// Calculate the range of motion vectors to check for each rank
 void get_range(int range[], int amount_motion_vectors){
     int amount_working_processes = amount_processes - 1;
     if(amount_working_processes == 0){
@@ -252,7 +172,7 @@ void get_range(int range[], int amount_motion_vectors){
     }
 }
 
-// Gets next motion vector as snail like iteration through all possibilities
+// Gets next motion vector as snail like iteration through all possibilities (e.g. iteration_best_motion_vector.png)
 tPixel_index get_next_motion_vector(int iteration){
     int tmp_x;
     int tmp_y;
@@ -374,11 +294,13 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
                     unsigned char ref_brightness = 0.30 * ref_pixel.red + 0.59 * ref_pixel.green + 0.11 * ref_pixel.blue;
                     unsigned char other_brightness = 0.30 * other_pixel.red + 0.59 * other_pixel.green + 0.11 * other_pixel.blue;
                     unsigned char value;
+                    // Calculate the difference. Since there is no abs-function for unsigned chars, we need to check the case before
                     if(ref_brightness >= other_brightness){
                         value = ref_brightness - other_brightness;
                     } else {
                         value = other_brightness - ref_brightness;
                     }
+                    // Add to the current_SAD-Value. If it already exceeded the mininmal SAD value, we can stop checking this motion vector
                     current_SAD += (int) value;
                     if(current_SAD > minimal_SAD){
                         exceeded_minimal_sad = 1;
@@ -400,10 +322,10 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
                 y_height_motion = current_y_height_motion;
             }
         }
-        // Add vector for macro block here
 #ifdef TEST_SAD_CALC
         printf("Current macro block: %i\nMotion Vector: x_width = %i, y_height = %i\nSAD-value: %f\n", current_macro_block, x_width_motion, y_height_motion, minimal_SAD);
 #endif
+        // Add vector for macro block here
         tPixel_index motion_vector = {x_width_motion, y_height_motion};
         tMacro_Block_SAD * macro_block_SAD = malloc(sizeof(tMacro_Block_SAD));
         macro_block_SAD->value_SAD = minimal_SAD;
@@ -415,6 +337,7 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
 }
 
 // ===================En-/Decode Functions===================
+// Encode the files into a <file_name>.bpg binary file
 int encode_files(tList * file_data, tList * compared_pictures){
     // All data will be seperated by a single space character
     int i;
@@ -486,23 +409,29 @@ int encode_files(tList * file_data, tList * compared_pictures){
 }
 
 // ===================Evaluation Functions===================
+// Calculate the time difference 
 double calculate_time_difference(struct timeval start_time, struct timeval end_time){
     return ((end_time.tv_sec - start_time.tv_sec) * 1000000 + end_time.tv_usec - start_time.tv_usec) / 1000.0;
 }
 
+// Calculate and add a value to the evaluation list
 void add_to_evaluation_list(char * evaluation_for, struct timeval start_time, struct timeval end_time, double calculated_difference){
     tTime_evaluation * tmp_evaluation = malloc(sizeof(tTime_evaluation));
+
+    // If there is no real distance given, calculate it 
     if(calculated_difference == -1.0){
         tmp_evaluation->time_difference = calculate_time_difference(start_time, end_time);
     } else {
         tmp_evaluation->time_difference = calculated_difference;
     }
+
     tmp_evaluation->evaluation_for = malloc(strlen(evaluation_for) + 1);
     strcpy(tmp_evaluation->evaluation_for, evaluation_for);
     append_element(time_evaluation_list, tmp_evaluation);
 }
 
 // ===================End Programm Functions===================
+// Function to free all malloc'ed data
 void end_programm(tList * file_data_list, tList * list_compared_pictures){
     int i;
 
