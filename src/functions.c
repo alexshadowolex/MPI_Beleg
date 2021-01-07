@@ -409,11 +409,6 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
         macro_block_SAD->value_SAD = minimal_SAD;
         macro_block_SAD->motion_vector = motion_vector;
         append_element(all_macro_block_SAD, macro_block_SAD);
-
-        // float progress = (i / amount_macro_blocks) * 100;
-        // if(progress == 10 || progress == 20 || progress == 30 || progress == 40 || progress == 50 || progress == 60 || progress == 70 || progress == 80 || progress == 90 || progress == 100){
-        //     time_printf(("Progress comparing %s and %s: %f\%\n", ref_picture->file_name, other_picture->file_name, progress));
-        // }
     }
 
     return all_macro_block_SAD;

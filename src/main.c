@@ -86,15 +86,16 @@ int main(int argc, char ** argv){
                 int iterator_macro_blocks;
                 tList * tmp_macro_block_list = create_list();
                 for(iterator_macro_blocks = 0; iterator_macro_blocks < get_amount_macro_blocks((tFile_data *) get_element(file_data_list, 0)->item); iterator_macro_blocks++){
-                    int iterate_amount_processes;
+                    int iterator_amount_processes;
                     float current_minimal_SAD = __INT_MAX__ / 2;
                     tPixel_index current_best_motion_vector;
-                    for(iterate_amount_processes = 0; iterate_amount_processes < amount_processes - 1; iterate_amount_processes++){
-                        //TODO get all lists for each macro block and compare them
-                        // adjust the end_programm, so only MASTER_RANK's data gets free'd and the file_data_list from each rank
-                        // TODO Seems to be working for everything except for 1 process
+                    for(iterator_amount_processes = 1; iterator_amount_processes < amount_processes; iterator_amount_processes++){
                         tTMP_Macro_Block_SAD buffer;
-                        MPI_Recv(&buffer, 1, MPI_tMacro_Block_SAD, MPI_ANY_SOURCE, iterator_macro_blocks, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+                        if(iterator_amount_processes == 1){
+                            MPI_Recv(&buffer, 1, MPI_tMacro_Block_SAD, iterator_amount_processes, iterator_macro_blocks, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+                        } else {
+                            MPI_Recv(&buffer, 1, MPI_tMacro_Block_SAD, MPI_ANY_SOURCE, iterator_macro_blocks, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+                        }
                         if(buffer.value_SAD < current_minimal_SAD){
                             current_minimal_SAD = buffer.value_SAD;
                             current_best_motion_vector.x_width = buffer.x_width;
