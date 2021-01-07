@@ -15,17 +15,17 @@
 #define STB_DEFINE
 #include "../lib/stb/stb.h"
 
-//#define PNGSUITE_PRIMARY
+// #define PNGSUITE_PRIMARY
 #define TERM_OUTPUT
 
 
-//#define X11_DISPLAY
+// #define X11_DISPLAY
 
 
-//Globally used vars
+// Globally used vars
 
 
-//Timestamp
+// Timestamp
 void print_timestamp(void){
     char buffer[26];
     int millisec;
@@ -56,7 +56,7 @@ void init_mpi_data_types(void){
     MPI_Type_commit(&MPI_tMacro_Block_SAD);
 }
 
-//===================Reader Functions===================
+// ===================Reader Functions===================
 #ifdef X11_DISPLAY
 // #include    <../lib/X11/Xlib.h>
 XImage *CreateTrueColorImage(Display *display, Visual *visual, unsigned char *image, int width, int height, unsigned char *data){
@@ -203,11 +203,11 @@ tPixel_data access_file_data_array(tFile_data * file, int x_width, int y_height)
 }
 
 int get_amount_macro_blocks(tFile_data * ref_picture){
-    //Since every picture has an integer amount of macro blocks, the calculation is easy
+    // Since every picture has an integer amount of macro blocks, the calculation is easy
     return (ref_picture->height / SIZE_MACRO_BLOCK) * (ref_picture->width / SIZE_MACRO_BLOCK);
 }
 
-//===================SAD Functions===================
+// ===================SAD Functions===================
 /* Macro blocks are counted like this:
  * 0-1-2
  * 3-4-5
@@ -215,7 +215,7 @@ int get_amount_macro_blocks(tFile_data * ref_picture){
  * The function returns the index of the left-upper pixel of a macro block (first: 0,0; second: 0,16;...)
  */
 void get_macro_block_begin(tFile_data * ref_picture, int number_macro_block, int index[]){
-    //returns: int[]{width, height}, pointing at the index of the left upper pixel
+    // returns: int[]{width, height}, pointing at the index of the left upper pixel
     if(number_macro_block >= get_amount_macro_blocks(ref_picture)){
         return;
     }
@@ -252,12 +252,12 @@ void get_range(int range[], int amount_motion_vectors){
     }
 }
 
-//Gets next motion vector as snail like iteration through all possibilities
+// Gets next motion vector as snail like iteration through all possibilities
 tPixel_index get_next_motion_vector(int iteration){
     int tmp_x;
     int tmp_y;
 
-    //Checking, which distance we are searching through with the current iteration
+    // Checking, which distance we are searching through with the current iteration
     int current_distance = 0;
     while(1){
         if(((current_distance * 2) + 1) * ((current_distance * 2) + 1) > iteration){
@@ -270,7 +270,7 @@ tPixel_index get_next_motion_vector(int iteration){
         tmp_x = 0;
         tmp_y = 0;
     } else {
-        //Substract all possible motion vectors that happened before our current distance
+        // Substract all possible motion vectors that happened before our current distance
         iteration -= get_amount_motion_vectors(current_distance - 1);
         int tmp_iteration;
         int move_x;
@@ -284,17 +284,17 @@ tPixel_index get_next_motion_vector(int iteration){
             } else {
                 // Checking if we reached one corner, so we can change the direction we are moving towards
                 if(move_x != 0 && abs(tmp_x) == current_distance){
-                    //Corner reached and x was moving, stop moving x
+                    // Corner reached and x was moving, stop moving x
                     move_x = 0;
-                    //Check where y needs to get move towards
-                    //If y is at the postive end, move to towards the negative end
+                    // Check where y needs to get move towards
+                    // If y is at the postive end, move to towards the negative end
                     if(tmp_y == current_distance){
                         move_y = -1;
                     } else {
                         move_y = 1;
                     }
                 } else {
-                    //Only one can happen in a direction change
+                    // Only one can happen in a direction change
                     if(move_y != 0 && abs(tmp_y) == current_distance){
                         move_y = 0;
                         if(tmp_x == current_distance){
@@ -317,13 +317,13 @@ tPixel_index get_next_motion_vector(int iteration){
     return ret_vector;
 }
 
-//Calculates the SAD values for all possible motion vectors for all macro blocks
+// Calculates the SAD values for all possible motion vectors for all macro blocks
 tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, int distanze_motion_vector_search, int range_start, int range_end){
-    //The list holds for all macro blocks the best motion vector in a struct tMacro_Block_SAD
+    // The list holds for all macro blocks the best motion vector in a struct tMacro_Block_SAD
     tList * all_macro_block_SAD = create_list();
     int amount_macro_blocks = get_amount_macro_blocks(ref_picture);
     int current_macro_block, current_x_width_motion, current_y_height_motion, x_current_width_macro_block, y_current_height_macro_block;
-    //for the distance 1, the amount is 9, for 2 it's 25 etc.
+    // for the distance 1, the amount is 9, for 2 it's 25 etc.
     int amount_motion_vectors = get_amount_motion_vectors(distanze_motion_vector_search);
 #ifdef TEST_SAD_CALC
     xprintf(("Distance motion vector: %i\n", distanze_motion_vector_search));
@@ -333,7 +333,7 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
         current_macro_block < amount_macro_blocks; 
         current_macro_block++){
 
-        //Compare all macro blocks
+        // Compare all macro blocks
         int begin_index[2];
         get_macro_block_begin(ref_picture, current_macro_block, begin_index);
         float minimal_SAD = INT_MAX;
@@ -341,8 +341,8 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
         int y_height_motion;
         int current_motion_vector_iteration;
         int found_minimal_SAD = 0;
-        //get_next_motion_vector will return values for the iteration
-        //amount_motion_vectors is the amount of motion vectors that have to get tested
+        // get_next_motion_vector will return values for the iteration
+        // amount_motion_vectors is the amount of motion vectors that have to get tested
         for(current_motion_vector_iteration = range_start; 
             current_motion_vector_iteration < range_end && !found_minimal_SAD; 
             current_motion_vector_iteration++){
@@ -352,8 +352,8 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
             current_y_height_motion = next_motion_vector.y_height;
             float current_SAD = 0;
             int exceeded_minimal_sad = 0;
-            //Calculate minimal SAD and save the value and the fitting distance motion vector
-            //Iterate over all pixels in a macro block (SIZE_MACRO_BLOCK x SIZE_MACRO_BLOCK)
+            // Calculate minimal SAD and save the value and the fitting distance motion vector
+            // Iterate over all pixels in a macro block (SIZE_MACRO_BLOCK x SIZE_MACRO_BLOCK)
             for(x_current_width_macro_block = begin_index[0]; 
                 x_current_width_macro_block < begin_index[0] + SIZE_MACRO_BLOCK && !exceeded_minimal_sad;
                 x_current_width_macro_block++){
@@ -361,13 +361,13 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
                     y_current_height_macro_block < begin_index[1] + SIZE_MACRO_BLOCK && !exceeded_minimal_sad; 
                     y_current_height_macro_block++){
                     
-                    //Get current pixeldata from ref_picture
+                    // Get current pixeldata from ref_picture
                     tPixel_data ref_pixel = access_file_data_array(ref_picture, x_current_width_macro_block + current_x_width_motion, y_current_height_macro_block + current_y_height_motion);
-                    //Get current pixeldata from other_picture, moved by current motion vector
+                    // Get current pixeldata from other_picture, moved by current motion vector
                     tPixel_data other_pixel = access_file_data_array(other_picture, x_current_width_macro_block, y_current_height_macro_block);
 
                     if(!ref_pixel.initialized_correct){
-                        //Means we tried to access a pixel outside of the picture
+                        // Means we tried to access a pixel outside of the picture
                         current_SAD += INT_MAX / 2;
                         continue;
                     }
@@ -385,13 +385,13 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
                     }
                 }
             }
-            //Comparing minimal sad with the current vector and minimal SAD
+            // Comparing minimal sad with the current vector and minimal SAD
             if(current_SAD == 0){
-                //Will stop the iterations, 0 is the total minimum
+                // Will stop the iterations, 0 is the total minimum
                 found_minimal_SAD = 1;
             }
             if(current_SAD < minimal_SAD){
-                //Save the lowest sad Value and the fitting motion vector
+                // Save the lowest sad Value and the fitting motion vector
 #ifdef TEST_SAD_CALC
                 xprintf(("Found new minimal SAD: %f\n", current_SAD));
 #endif
@@ -400,7 +400,7 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
                 y_height_motion = current_y_height_motion;
             }
         }
-        //Add vector for macro block here
+        // Add vector for macro block here
 #ifdef TEST_SAD_CALC
         printf("Current macro block: %i\nMotion Vector: x_width = %i, y_height = %i\nSAD-value: %f\n", current_macro_block, x_width_motion, y_height_motion, minimal_SAD);
 #endif
@@ -414,15 +414,15 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
     return all_macro_block_SAD;
 }
 
-//===================En-/Decode Functions===================
+// ===================En-/Decode Functions===================
 int encode_files(tList * file_data, tList * compared_pictures){
-    //All data will be seperated by a single space character
+    // All data will be seperated by a single space character
     int i;
-    //Get the reference picture and data
+    // Get the reference picture and data
     tFile_data * ref_picture = (tFile_data *) get_element(file_data, 0)->item;
 
     for(i = 0; i < compared_pictures->size; i++){
-        //Get the current picture to encode
+        // Get the current picture to encode
         tFile_data * current_picture = (tFile_data *) get_element(file_data, i + 1)->item;
 
         char file_name[strlen(current_picture->file_name) + 4];
@@ -431,13 +431,13 @@ int encode_files(tList * file_data, tList * compared_pictures){
         xprintf(("file_name: %s\n", file_name));
         FILE * file = fopen(file_name, "w+");
 
-        //Write the amount of macroblocks to the file
+        // Write the amount of macroblocks to the file
         int amount_macro_blocks = get_amount_macro_blocks(current_picture);
         fwrite(&amount_macro_blocks, sizeof(int), 1, file);
 
-        //Get all macro blocks data
+        // Get all macro blocks data
         tList * current_all_macro_blocks = (tList *) get_element(compared_pictures, i)->item;
-        //Write all motion vectors to the file
+        // Write all motion vectors to the file
         int iterator_motion_vectors;
         for(iterator_motion_vectors = 0; iterator_motion_vectors < current_all_macro_blocks->size; iterator_motion_vectors++){
             tMacro_Block_SAD * tmp_block_info = (tMacro_Block_SAD *) get_element(current_all_macro_blocks, iterator_motion_vectors)->item;
@@ -448,7 +448,7 @@ int encode_files(tList * file_data, tList * compared_pictures){
         }
         xprintf(("Wrote motion vectors\n"));
 
-        //Write all decoded data
+        // Write all decoded data
         int iterator_macro_blocks;
         for(iterator_macro_blocks = 0; iterator_macro_blocks < current_all_macro_blocks->size; iterator_macro_blocks++){
             tMacro_Block_SAD * tmp_block_info = (tMacro_Block_SAD *) get_element(current_all_macro_blocks, iterator_macro_blocks)->item;
@@ -462,8 +462,8 @@ int encode_files(tList * file_data, tList * compared_pictures){
                     tPixel_data tmp_current_data = access_file_data_array(current_picture, width, height);
                     tPixel_data tmp_ref_data = access_file_data_array(ref_picture, width + motion_vector.x_width, height + motion_vector.y_height);
                     
-                    //Getting the difference as a signed short
-                    //Difference is always ref_pixeld_data - encode_pixel_data
+                    // Getting the difference as a signed short
+                    // Difference is always ref_pixeld_data - encode_pixel_data
                     signed short red_short = (signed short) (tmp_ref_data.red - tmp_current_data.red);
                     signed short green_short = (signed short) (tmp_ref_data.green - tmp_current_data.green);
                     signed short blue_short = (signed short) (tmp_ref_data.blue - tmp_current_data.blue);
@@ -485,7 +485,7 @@ int encode_files(tList * file_data, tList * compared_pictures){
     return EXIT_SUCCESS;
 }
 
-//===================Evaluation Functions===================
+// ===================Evaluation Functions===================
 double calculate_time_difference(struct timeval start_time, struct timeval end_time){
     return ((end_time.tv_sec - start_time.tv_sec) * 1000000 + end_time.tv_usec - start_time.tv_usec) / 1000.0;
 }
@@ -502,24 +502,24 @@ void add_to_evaluation_list(char * evaluation_for, struct timeval start_time, st
     append_element(time_evaluation_list, tmp_evaluation);
 }
 
-//===================End Programm Functions===================
+// ===================End Programm Functions===================
 void end_programm(tList * file_data_list, tList * list_compared_pictures){
     int i;
 
-    //Delete all file datas
+    // Delete all file datas
     tList_Element * current_element = file_data_list->first_element;
     for(i = 0; i < file_data_list->size; i++){
-        //Delete the tFile_data->data first
+        // Delete the tFile_data->data first
         free(((tFile_data *) current_element->item)->data);
         free(((tFile_data *) current_element->item)->file_name);
         if(current_element->next_element != NULL){
             current_element = current_element->next_element;
         }
     }
-    //Now delete the whole list
+    // Now delete the whole list
     delete_list(file_data_list);
 
-    //Delete all macro block data of compared pictures
+    // Delete all macro block data of compared pictures
     current_element = list_compared_pictures->first_element;
     for(i = 0; i < list_compared_pictures->size; i++){
         delete_list((tList *) current_element->item);
@@ -528,7 +528,7 @@ void end_programm(tList * file_data_list, tList * list_compared_pictures){
         }
     }
 
-    //Now delete the whole list (again). Using the function would free the (already freed) items again, which causes leaks
+    // Now delete the whole list (again). Using the function would free the (already freed) items again, which causes leaks
     tList_Element * tmp_next_element = list_compared_pictures->first_element;
     do{
         tList_Element * tmp = tmp_next_element;
