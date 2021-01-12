@@ -164,13 +164,29 @@ void get_range(int range[], int amount_motion_vectors){
         range[0] = 0;
         range[1] = amount_motion_vectors;
     } else {
-        range[0] = (amount_motion_vectors / (amount_working_processes)) * (rank - 1);
+        range[0] = (amount_motion_vectors / amount_working_processes) * (rank - 1);
         if(rank == amount_working_processes){
             range[1] = amount_motion_vectors;
         } else {
-            range[1] = (amount_motion_vectors / (amount_working_processes)) * (rank);
+            range[1] = (amount_motion_vectors / amount_working_processes) * (rank);
+        }
+        // Caclulate the rest of motion vectors, which are all left for the last rank
+        int rest = amount_motion_vectors % amount_working_processes;
+        int working_rank = rank - 1;
+        if(working_rank < rest && working_rank != amount_working_processes - 1){
+            range[1]++;
+        }
+        if(working_rank != 0 && rest > 0){
+            int move_begin = 0;
+            if(rank <= rest){
+                move_begin = working_rank;
+            } else {
+                move_begin = rest;
+            }
+            range[0] += move_begin; 
         }
     }
+    xprintf(("Range for %i: %i-%i\n", rank, range[0], range[1]));
 }
 
 // Gets next motion vector as snail like iteration through all possibilities (e.g. iteration_best_motion_vector.png)
