@@ -186,7 +186,7 @@ void get_range(int range[], int amount_motion_vectors){
             range[0] += move_begin; 
         }
     }
-    xprintf(("Range for %i: %i-%i\n", rank, range[0], range[1]));
+    printf("Range for %i: %i-%i\n", rank, range[0], range[1]);
 }
 
 // Gets next motion vector as snail like iteration through all possibilities (e.g. iteration_best_motion_vector.png)
