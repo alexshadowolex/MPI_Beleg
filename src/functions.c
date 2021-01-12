@@ -173,8 +173,14 @@ void get_range(int range[], int amount_motion_vectors){
         // Caclulate the rest of motion vectors, which are all left for the last rank
         int rest = amount_motion_vectors % amount_working_processes;
         int working_rank = rank - 1;
-        if(working_rank < rest && working_rank != amount_working_processes - 1){
-            range[1]++;
+        if(working_rank != amount_working_processes - 1 && rest > 0){
+            int move_end = 0;
+            if(rank <= rest){
+                move_end = working_rank;
+            } else {
+                move_end = rest;
+            }
+            range[1] += move_end; 
         }
         if(working_rank != 0 && rest > 0){
             int move_begin = 0;
