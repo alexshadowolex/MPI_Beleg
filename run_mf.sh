@@ -21,7 +21,7 @@ else
     #Run the program
     echo "Run program"
     
-    mpiexec -hostfile machinefile -n $amount_processes ./bin/main $command_line_args
+    mpiexec -f machinefile -n $amount_processes ./bin/main $command_line_args
     #Save the return-value
     ret=$?
     extra_message=""

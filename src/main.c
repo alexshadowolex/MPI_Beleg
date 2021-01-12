@@ -126,6 +126,8 @@ int main(int argc, char ** argv){
                             MPI_Recv(&buffer, 1, MPI_tMacro_Block_SAD, MPI_ANY_SOURCE, iterator_macro_blocks, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
                         }
 
+                        //TODO mpi_all_to_all zum austauschen des minimalen SAD wertes
+
                         // Evaluatue like in calc_SAD_values
                         if(buffer.value_SAD < current_minimal_SAD){
                             current_minimal_SAD = buffer.value_SAD;
@@ -272,8 +274,6 @@ int main(int argc, char ** argv){
 
     time_printf(("Finished freeing all malloced data\n"));
 
-    MPI_Finalize();
-
     time_printf(("Finished running the program!\n\n"));
     
     gettimeofday(&total_end_time, NULL);
@@ -301,6 +301,8 @@ int main(int argc, char ** argv){
         }
     }
     delete_list(time_evaluation_list);
+    
+    MPI_Finalize();
 
     exit(EXIT_SUCCESS);
 }

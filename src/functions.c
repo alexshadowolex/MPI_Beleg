@@ -158,6 +158,7 @@ int get_amount_motion_vectors(int distance_motion_vector){
 
 // Calculate the range of motion vectors to check for each rank
 void get_range(int range[], int amount_motion_vectors){
+    // Verteilung verbessern: überhang von vorne gleichmäßig aufteilen
     int amount_working_processes = amount_processes - 1;
     if(amount_working_processes == 0){
         range[0] = 0;
