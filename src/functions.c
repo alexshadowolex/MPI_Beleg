@@ -334,7 +334,7 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
                     MPI_Ialltoall(&current_values, 1, MPI_tMacro_Block_SAD, &alltoall_buffer, 1, MPI_tMacro_Block_SAD, MPI_COMM_WORLD, &request);
                     int alltoall_iterator;
                     for(alltoall_iterator = 0; alltoall_iterator < size_alltoall_buffer; alltoall_iterator++){
-                        printf("Current SAD: %f, Current X: %i, Current y: %i, Alltoall SAD: %f\n", current_values.value_SAD, current_values.x_width, current_values.y_height, alltoall_buffer[alltoall_iterator].value_SAD);
+                        printf("%i current_macro_block: Current SAD: %f, Current X: %i, Current y: %i, Alltoall SAD: %f\n",current_macro_block, current_values.value_SAD, current_values.x_width, current_values.y_height, alltoall_buffer[alltoall_iterator].value_SAD);
                         if(alltoall_buffer[alltoall_iterator].value_SAD < current_values.value_SAD){
                             exceeded_minimal_sad = 1;
                             break;
