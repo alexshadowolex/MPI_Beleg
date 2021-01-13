@@ -330,7 +330,8 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
                     }
                     // Add to the current_SAD-Value. If it already exceeded the mininmal SAD value, we can stop checking this motion vector
                     current_values.value_SAD += (int) value;
-                    MPI_Ialltoall(&current_values, 1, MPI_tMacro_Block_SAD, &alltoall_buffer, 1, MPI_tMacro_Block_SAD, MPI_COMM_WORLD);
+                    MPI_Request request;
+                    MPI_Ialltoall(&current_values, 1, MPI_tMacro_Block_SAD, &alltoall_buffer, 1, MPI_tMacro_Block_SAD, MPI_COMM_WORLD, &request);
                     int alltoall_iterator;
                     for(alltoall_iterator = 0; alltoall_iterator < size_alltoall_buffer; alltoall_iterator++){
                         if(alltoall_buffer[alltoall_iterator].value_SAD < current_values.value_SAD){
