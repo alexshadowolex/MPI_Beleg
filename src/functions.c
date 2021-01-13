@@ -150,6 +150,7 @@ void get_macro_block_begin(tFile_data * ref_picture, int number_macro_block, int
 
 // Calculate the given distance for motion vectors into the amount of all motion vectors inside the distance
 int get_amount_motion_vectors(int distance_motion_vector){
+    // for the distance 1, the amount is 9, for 2 it's 25 etc.
     if(distance_motion_vector < 0){
         return -1;
     }
@@ -158,7 +159,6 @@ int get_amount_motion_vectors(int distance_motion_vector){
 
 // Calculate the range of motion vectors to check for each rank
 void get_range(int range[], int amount_motion_vectors){
-    // Verteilung verbessern: überhang von vorne gleichmäßig aufteilen
     int amount_working_processes = amount_processes - 1;
     if(amount_working_processes == 0){
         range[0] = 0;
@@ -265,7 +265,7 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
     tList * all_macro_block_SAD = create_list();
     int amount_macro_blocks = get_amount_macro_blocks(ref_picture);
     int current_macro_block, current_x_width_motion, current_y_height_motion, x_current_width_macro_block, y_current_height_macro_block;
-    // for the distance 1, the amount is 9, for 2 it's 25 etc.
+
     int amount_motion_vectors = get_amount_motion_vectors(distanze_motion_vector_search);
 #ifdef TEST_SAD_CALC
     xprintf(("Distance motion vector: %i\n", distanze_motion_vector_search));
