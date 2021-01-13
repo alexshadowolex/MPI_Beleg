@@ -358,8 +358,8 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
                         current_SAD += INT_MAX / 2;
                         continue;
                     }
-                    unsigned char ref_brightness = 0.30 * ref_pixel.red + 0.59 * ref_pixel.green + 0.11 * ref_pixel.blue;
-                    unsigned char other_brightness = 0.30 * other_pixel.red + 0.59 * other_pixel.green + 0.11 * other_pixel.blue;
+                    unsigned char ref_brightness = (unsigned char) ((30 * ref_pixel.red + 59 * ref_pixel.green + 11 * ref_pixel.blue) / 100);
+                    unsigned char other_brightness = (unsigned char) ((30 * other_pixel.red + 59 * other_pixel.green + 11 * other_pixel.blue) / 100);
                     unsigned char value;
                     if(ref_brightness >= other_brightness){
                         value = ref_brightness - other_brightness;
