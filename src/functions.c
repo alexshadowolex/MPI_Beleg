@@ -383,6 +383,7 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
             
             macro_block_SAD->value_SAD = minimal_SAD;
             macro_block_SAD->motion_vector = motion_vector;
+            printf("Vector: %i-%i, Value: %f\n", motion_vector.x_width, motion_vector.y_height, minimal_SAD);
         } else {
             macro_block_SAD = NULL;
         }
