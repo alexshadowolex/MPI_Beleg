@@ -177,7 +177,7 @@ void get_range(int range[], int amount_motion_vectors){
         if(working_rank != amount_working_processes - 1 && rest > 0){
             int move_end = 0;
             if(rank <= rest){
-                move_end = working_rank;
+                move_end = working_rank + 1;
             } else {
                 move_end = rest;
             }
