@@ -109,40 +109,21 @@ int main(int argc, char ** argv){
 
                 // Iterate over all macro blocks
                 for(iterator_macro_blocks = 0; iterator_macro_blocks < get_amount_macro_blocks((tFile_data *) get_element(file_data_list, 0)->item); iterator_macro_blocks++){
-                    int iterator_amount_processes;
-                    float current_minimal_SAD = __INT_MAX__ / 2;
-                    tPixel_index current_best_motion_vector;
-
-                    // Iterate over all processes
-                    for(iterator_amount_processes = 1; iterator_amount_processes < amount_processes; iterator_amount_processes++){
-                        tTMP_Macro_Block_SAD buffer;
-
-                        // If we are in the first iteration, only receive a message from the first rank, which always checks the 0-vector
-                        // so we guarantee that this vector is prioritzed (e.g. there are several vectors with SAD = 0, so it gets random chosen)
-                        if(iterator_amount_processes == 1){
-                            MPI_Recv(&buffer, 1, MPI_tMacro_Block_SAD, iterator_amount_processes, iterator_macro_blocks, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-                        } else {
-                            // if not, the order doesn't matter
-                            MPI_Recv(&buffer, 1, MPI_tMacro_Block_SAD, MPI_ANY_SOURCE, iterator_macro_blocks, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-                        }
-
-                        //TODO mpi_all_to_all zum austauschen des minimalen SAD wertes
-
-                        // Evaluatue like in calc_SAD_values
-                        if(buffer.value_SAD < current_minimal_SAD){
-                            current_minimal_SAD = buffer.value_SAD;
-                            current_best_motion_vector.x_width = buffer.x_width;
-                            current_best_motion_vector.y_height = buffer.y_height;
-                            // Stop if the value is 0
-                            if(current_minimal_SAD == 0){
-                                break;
-                            }
-                        }
-                    }
+                    // if(iterator_amount_processes == 1){
+                    //     MPI_Recv(&buffer, 1, MPI_tMacro_Block_SAD, iterator_amount_processes, iterator_macro_blocks, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+                    // } else {
+                    //     // if not, the order doesn't matter
+                    //     MPI_Recv(&buffer, 1, MPI_tMacro_Block_SAD, MPI_ANY_SOURCE, iterator_macro_blocks, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+                    // }
                     // Add the values to the list of this picture
+                    tTMP_Macro_Block_SAD buffer;
+                    MPI_Recv(&buffer, 1, MPI_tMacro_Block_SAD, MPI_ANY_SOURCE, iterator_macro_blocks, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
                     tMacro_Block_SAD * tmp_new_entry = malloc(sizeof(tMacro_Block_SAD));
-                    tmp_new_entry->motion_vector = current_best_motion_vector;
-                    tmp_new_entry->value_SAD = current_minimal_SAD;
+                    tPixel_index best_motion_vector;
+                    best_motion_vector.x_width = buffer.x_width;
+                    best_motion_vector.y_height = buffer.y_height;
+                    tmp_new_entry->motion_vector = best_motion_vector;
+                    tmp_new_entry->value_SAD = buffer.value_SAD;
 
                     append_element(tmp_macro_block_list, tmp_new_entry);
                 }
@@ -168,11 +149,13 @@ int main(int argc, char ** argv){
                 for(iterator_macro_block = 0; iterator_macro_block < tmp_list->size; iterator_macro_block++){
                     tTMP_Macro_Block_SAD buffer;
                     tMacro_Block_SAD * tmp = (tMacro_Block_SAD *) get_element(tmp_list, iterator_macro_block)->item;
-                    buffer.value_SAD = tmp->value_SAD;
-                    buffer.x_width = tmp->motion_vector.x_width;
-                    buffer.y_height = tmp->motion_vector.y_height;
-                    
-                    MPI_Send(&buffer, 1, MPI_tMacro_Block_SAD, MASTER_RANK, iterator_macro_block, MPI_COMM_WORLD);
+                    if(tmp != NULL){
+                        buffer.value_SAD = tmp->value_SAD;
+                        buffer.x_width = tmp->motion_vector.x_width;
+                        buffer.y_height = tmp->motion_vector.y_height;
+                        
+                        MPI_Send(&buffer, 1, MPI_tMacro_Block_SAD, MASTER_RANK, iterator_macro_block, MPI_COMM_WORLD);
+                    }
                 }
                 // list is not needed anymore
                 delete_list(tmp_list);
