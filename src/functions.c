@@ -172,7 +172,6 @@ void get_range(int range[], int amount_motion_vectors){
         }
         // Caclulate the rest of motion vectors, which are all left for the last rank
         int rest = amount_motion_vectors % amount_working_processes;
-        printf("%i - Rest: %i\n", rank, rest);
         int working_rank = rank - 1;
         if(working_rank != amount_working_processes - 1 && rest > 0){
             int move_end = 0;
@@ -181,7 +180,6 @@ void get_range(int range[], int amount_motion_vectors){
             } else {
                 move_end = rest;
             }
-            printf("%i Modifying end with: %i\n", rank, move_end);
             range[1] += move_end; 
         }
         if(working_rank != 0 && rest > 0){
@@ -191,11 +189,10 @@ void get_range(int range[], int amount_motion_vectors){
             } else {
                 move_begin = rest;
             }
-            printf("%i Modifying start with: %i\n", rank, move_begin);
             range[0] += move_begin; 
         }
     }
-    printf("Range for %i: %i-%i\n", rank, range[0], range[1]);
+    printf("Range for %i: %i-%i (%i)\n", rank, range[0], range[1], (range[1] - range[0]));
 }
 
 // Gets next motion vector as snail like iteration through all possibilities (e.g. iteration_best_motion_vector.png)
