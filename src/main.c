@@ -72,6 +72,7 @@ int main(int argc, char ** argv){
 
     struct timeval calc_start_time, calc_end_time;
     gettimeofday(&calc_start_time, NULL);
+    double time_for_calculation = 0.0;
 
     // When only one process exists, there is no master rank needed
     if(amount_processes == 1){
@@ -119,12 +120,16 @@ int main(int argc, char ** argv){
 
                         // If we are in the first iteration, only receive a message from the first rank, which always checks the 0-vector
                         // so we guarantee that this vector is prioritzed (e.g. there are several vectors with SAD = 0, so it gets random chosen)
+                        struct timeval calc_send_start_time, calc_send_end_time;
+                        gettimeofday(&calc_send_start_time, NULL);
                         if(iterator_amount_processes == 1){
                             MPI_Recv(&buffer, 1, MPI_tMacro_Block_SAD, iterator_amount_processes, iterator_macro_blocks, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
                         } else {
                             // if not, the order doesn't matter
                             MPI_Recv(&buffer, 1, MPI_tMacro_Block_SAD, MPI_ANY_SOURCE, iterator_macro_blocks, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
                         }
+                        gettimeofday(&calc_send_end_time, NULL);
+                        time_for_calculation += calculate_time_difference(calc_send_start_time, calc_send_end_time);
 
                         //TODO mpi_all_to_all zum austauschen des minimalen SAD wertes
 
@@ -182,7 +187,12 @@ int main(int argc, char ** argv){
 
     gettimeofday(&calc_end_time, NULL);
 
-    add_to_evaluation_list("Calculating Motion Vectors", calc_start_time, calc_end_time, -1.0);
+    if(amount_processes > 1){    
+        add_to_evaluation_list("Calculating Motion Vectors and Sending only", calc_start_time, calc_end_time, time_for_calculation);
+        add_to_evaluation_list("Evaluating sended Values", calc_start_time, calc_end_time, calculate_time_difference(calc_start_time, calc_end_time) - time_for_calculation);
+    }
+
+    add_to_evaluation_list("Calculating Motion Vectors TOTAL", calc_start_time, calc_end_time, -1.0);
 
     time_printf(("Finished calculating the motion vectors\n"));
 
@@ -297,7 +307,7 @@ int main(int argc, char ** argv){
     if(rank == MASTER_RANK){
         for(iterator_time_evaluation = 0; iterator_time_evaluation < time_evaluation_list->size; iterator_time_evaluation++){
             tTime_evaluation * tmp = (tTime_evaluation *) get_element(time_evaluation_list, iterator_time_evaluation)->item;
-            time_printf(("Time used for %-30s: %0.3f ms (= %0.3f s)\n", tmp->evaluation_for, tmp->time_difference, (tmp->time_difference / 1000) ));
+            time_printf(("Time used for %-40s: %0.3f ms (= %0.3f s)\n", tmp->evaluation_for, tmp->time_difference, (tmp->time_difference / 1000) ));
         }
     }
     delete_list(time_evaluation_list);
