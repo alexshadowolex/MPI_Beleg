@@ -16,6 +16,11 @@ int main(int argc, char ** argv){
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &amount_processes);
 
+    char processor_name[MPI_MAX_PROCESSOR_NAME];
+    int name_len;
+    MPI_Get_processor_name(processor_name, &name_len);
+    printf("Processor name: %s\n", processor_name);
+
     if(argc <= 3){
         time_printf(("Not enough args! Usage: %s <distanze_motion_vector_search> <ref_picture> <picture 1> (optional: more picturesult)\n", argv[0]));
         MPI_Abort(MPI_COMM_WORLD ,EXIT_FAILURE);
@@ -307,7 +312,7 @@ int main(int argc, char ** argv){
     if(rank == MASTER_RANK){
         for(iterator_time_evaluation = 0; iterator_time_evaluation < time_evaluation_list->size; iterator_time_evaluation++){
             tTime_evaluation * tmp = (tTime_evaluation *) get_element(time_evaluation_list, iterator_time_evaluation)->item;
-            time_printf(("Time used for %-40s: %0.3f ms (= %0.3f s)\n", tmp->evaluation_for, tmp->time_difference, (tmp->time_difference / 1000) ));
+            time_printf(("Time used for %-50s: %0.3f ms (= %0.3f s)\n", tmp->evaluation_for, tmp->time_difference, (tmp->time_difference / 1000) ));
         }
     }
     delete_list(time_evaluation_list);
