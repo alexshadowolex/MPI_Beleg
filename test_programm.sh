@@ -92,7 +92,7 @@ do
             then
                 speed_up=0
             else
-                speed_up=$(awk "BEGIN { (${reference_times[$iterator_values-1]}-milliseconds)*100/${reference_times[$iterator_values-1]}; print pc}")
+                speed_up=$(awk "BEGIN { pc=(${reference_times[$iterator_values-1]}-milliseconds)*100/${reference_times[$iterator_values-1]}; print pc}")
                 # speed_up=$(echo "(${reference_times[$iterator_values-1]}-milliseconds)*100/${reference_times[$iterator_values-1]}" | bc)
             fi
             speed_up_string="====> Speed up: $speed_up%"
