@@ -113,9 +113,8 @@ int main(int argc, char ** argv){
                 for(iterator_macro_blocks = 0; iterator_macro_blocks < get_amount_macro_blocks((tFile_data *) get_element(file_data_list, 0)->item); iterator_macro_blocks++){
                     // Add the values to the list of this picture
                     tTMP_Macro_Block_SAD buffer;
-                    printf("MAIN Waiting for %i macro block value\n", iterator_macro_blocks);
                     MPI_Recv(&buffer, 1, MPI_tMacro_Block_SAD, MPI_ANY_SOURCE, iterator_macro_blocks, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-                    printf("MAIN RECEIVED %i macro block value\n", iterator_macro_blocks);
+                    
                     tMacro_Block_SAD * tmp_new_entry = malloc(sizeof(tMacro_Block_SAD));
                     tPixel_index best_motion_vector;
                     best_motion_vector.x_width = buffer.x_width;
@@ -151,7 +150,7 @@ int main(int argc, char ** argv){
                         buffer.value_SAD = tmp->value_SAD;
                         buffer.x_width = tmp->motion_vector.x_width;
                         buffer.y_height = tmp->motion_vector.y_height;
-                        printf("Rank %i sending values for %i macro block\n", rank, iterator_macro_block);
+                        
                         MPI_Send(&buffer, 1, MPI_tMacro_Block_SAD, MASTER_RANK, iterator_macro_block, MPI_COMM_WORLD);
                     }
                 }
