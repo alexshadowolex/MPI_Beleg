@@ -61,7 +61,7 @@ do
     run_and_evaluate "$iterator_processor" "$distance_vectors"
 done
 
-reference_time_programm=""
+reference_time_programm=()
 for (( iterator_processors=$RANGE_START_PROCESSORS; iterator_processors<=$range_end_processors; iterator_processors++ ))
 do
     if [ $iterator_processors -eq $RANGE_START_PROCESSORS ]
@@ -80,7 +80,7 @@ do
         seconds=$(echo "$combined_values" | cut -d"|" -f2)
         speed_up=""
         speed_up_string=""
-        if [ $iterator_processors -eq $RANGE_START_PROCESSORS ]
+        if [ $iterator_processors -eq $RANGE_START_PROCESSORS -o -z "$iterator_processors" ]
         then
     	    reference_time_programm=$milliseconds
         else
@@ -88,10 +88,10 @@ do
             then
                 speed_up=0
             else
-                speed_up=$(echo "(milliseconds-reference_time_programm)*100/reference_time_programm" | bc)
+                speed_up=$(printf "%0.3f\n" $(echo "(($reference_time_programm-$milliseconds)*100)/$reference_time_programm" | bc -l))
             fi
-            speed_up_string="=> Speed up: $speed_up%"
+            speed_up_string="====> Speed up: $speed_up%"
         fi
-        echo "    ${evaluation_parts[$iterator_values-1]}: $milliseconds ms (= $seconds s) $speed_up_string"
+        echo "    $(printf "%-35s\n" "${evaluation_parts[$iterator_values-1]}"): $milliseconds ms (= $seconds s) $speed_up_string"
     done
 done
