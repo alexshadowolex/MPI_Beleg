@@ -16,10 +16,10 @@ int main(int argc, char ** argv){
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &amount_processes);
 
-    char processor_name[MPI_MAX_PROCESSOR_NAME];
-    int name_len;
-    MPI_Get_processor_name(processor_name, &name_len);
-    printf("Processor name: %s\n", processor_name);
+    // char processor_name[MPI_MAX_PROCESSOR_NAME];
+    // int name_len;
+    // MPI_Get_processor_name(processor_name, &name_len);
+    // printf("Processor name: %s\n", processor_name);
 
     if(argc <= 3){
         time_printf(("Not enough args! Usage: %s <distanze_motion_vector_search> <ref_picture> <picture 1> (optional: more picturesult)\n", argv[0]));
