@@ -355,20 +355,23 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
         // Add vector for macro block here
         tMacro_Block_SAD * macro_block_SAD = malloc(sizeof(tMacro_Block_SAD));
 
-        int size_receive_alltoall = amount_processes == 1 ? 1 : amount_processes - 1;
-        tTMP_Macro_Block_SAD * send_alltoall = malloc(size_receive_alltoall * sizeof(tTMP_Macro_Block_SAD));
-        tTMP_Macro_Block_SAD * receive_alltoall = malloc(size_receive_alltoall * sizeof(tTMP_Macro_Block_SAD));
+        int size_alltoall = amount_processes == 1 ? 1 : amount_processes - 1;
+        tTMP_Macro_Block_SAD * send_alltoall = malloc(size_alltoall * sizeof(tTMP_Macro_Block_SAD));
+        tTMP_Macro_Block_SAD * receive_alltoall = malloc(size_alltoall * sizeof(tTMP_Macro_Block_SAD));
 
-        send_alltoall[rank - 1].value_SAD = minimal_SAD;
-        send_alltoall[rank - 1].x_width = x_width_motion;
-        send_alltoall[rank - 1].y_height = y_height_motion;
+        int iterator_fill_alltoall;
+        for(iterator_fill_alltoall = 0; iterator_fill_alltoall < size_alltoall; iterator_fill_alltoall++){
+            send_alltoall[iterator_fill_alltoall].value_SAD = minimal_SAD;
+            send_alltoall[iterator_fill_alltoall].x_width = x_width_motion;
+            send_alltoall[iterator_fill_alltoall].y_height = y_height_motion;
+        }
 
         printf("BLOCK %i ----> Rank %i found values: %f; %i - %i\n", current_macro_block, rank, minimal_SAD, x_width_motion, y_height_motion);
 
         MPI_Alltoall(send_alltoall, 1, MPI_tMacro_Block_SAD, receive_alltoall, 1, MPI_tMacro_Block_SAD, worker);
         int iterator_alltoall;
         int rank_has_best_SAD_value = 1;
-        for(iterator_alltoall = 0; iterator_alltoall < size_receive_alltoall; iterator_alltoall++){
+        for(iterator_alltoall = 0; iterator_alltoall < size_alltoall; iterator_alltoall++){
             printf("Rank %i Iterating over values. Block %i from worker_rank %i: %f; %i - %i\n", rank, current_macro_block, iterator_alltoall, receive_alltoall[iterator_alltoall].value_SAD, receive_alltoall[iterator_alltoall].x_width, receive_alltoall[iterator_alltoall].y_height);
             if(iterator_alltoall == rank - 1){
                 continue;
