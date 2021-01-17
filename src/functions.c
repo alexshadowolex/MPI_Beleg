@@ -387,6 +387,7 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
         append_element(all_macro_block_SAD, macro_block_SAD);
         printf("Rank %i waiting\n", rank);
         MPI_Barrier(worker);
+        printf("Rank %i continuing\n", rank);
     }
 
     return all_macro_block_SAD;
