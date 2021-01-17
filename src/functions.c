@@ -285,8 +285,6 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
         int current_motion_vector_iteration;
         int found_minimal_SAD = 0;
 
-        // int size_receive_alltoall = amount_processes == 1 ? 1 : amount_processes - 1;
-        int size_receive_alltoall = amount_processes == 1 ? 1 : amount_processes - 1;
         // get_next_motion_vector will return values for the iteration
         // amount_motion_vectors is the amount of motion vectors that have to get tested
         for(current_motion_vector_iteration = range_start; 
@@ -356,16 +354,45 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
 #endif
         // Add vector for macro block here
         tMacro_Block_SAD * macro_block_SAD = malloc(sizeof(tMacro_Block_SAD));
-        // if(rank_has_best_SAD_value){
-        //     tPixel_index motion_vector = {x_width_motion, y_height_motion};
+
+        int size_receive_alltoall = amount_processes == 1 ? 1 : amount_processes - 1;
+        tTMP_Macro_Block_SAD * send_alltoall = malloc(size_receive_alltoall * sizeof(tTMP_Macro_Block_SAD));
+        tTMP_Macro_Block_SAD * receive_alltoall = malloc(size_receive_alltoall * sizeof(tTMP_Macro_Block_SAD));
+
+        send_alltoall[rank - 1].value_SAD = minimal_SAD;
+        send_alltoall[rank - 1].x_width = x_width_motion;
+        send_alltoall[rank - 1].y_height = y_height_motion;
+
+        MPI_Alltoall(send_alltoall, 1, MPI_tMacro_Block_SAD, receive_alltoall, 1, MPI_tMacro_Block_SAD, worker);
+        int iterator_alltoall;
+        int rank_has_best_SAD_value = 1;
+        for(iterator_alltoall = 0; iterator_alltoall < size_receive_alltoall; iterator_alltoall){
+            if(rank == 1) printf("Iterating over values. Block %i from worker_rank %i: %f; %i - %i\n", current_macro_block, iterator_alltoall, receive_alltoall[iterator_alltoall].value_SAD, receive_alltoall[iterator_alltoall].x_width, receive_alltoall[iterator_alltoall].y_height);
+            if(iterator_alltoall == rank - 1){
+                continue;
+            }
+            if(receive_alltoall[iterator_alltoall].value_SAD < minimal_SAD){
+                rank_has_best_SAD_value = 0;
+            }
+            if(receive_alltoall[iterator_alltoall].value_SAD == minimal_SAD && minimal_SAD == 0){
+                if(receive_alltoall[iterator_alltoall].x_width == 0 && receive_alltoall[iterator_alltoall].y_height == 0){
+                    rank_has_best_SAD_value = 0;
+                }
+                if(x_width_motion == 0 && y_height_motion == 0){
+                    rank_has_best_SAD_value = 1;
+                }
+            }
+        }
+
+        if(rank_has_best_SAD_value){
+            tPixel_index motion_vector = {x_width_motion, y_height_motion};
             
-        //     macro_block_SAD->value_SAD = minimal_SAD;
-        //     macro_block_SAD->motion_vector = motion_vector;
-        //     printf("Vector: %i-%i, Value: %f\n", motion_vector.x_width, motion_vector.y_height, minimal_SAD);
-        // } else {
-        //     macro_block_SAD = NULL;
-        // }
-        printf("Rank %i found for macro block %i following values: %f; %i - %i\n", rank, current_macro_block, minimal_SAD, x_width_motion, y_height_motion);
+            macro_block_SAD->value_SAD = minimal_SAD;
+            macro_block_SAD->motion_vector = motion_vector;
+        } else {
+            macro_block_SAD = NULL;
+        }
+        // printf("Rank %i found for macro block %i following values: %f; %i - %i\n", rank, current_macro_block, minimal_SAD, x_width_motion, y_height_motion);
         append_element(all_macro_block_SAD, macro_block_SAD);
         printf("Rank %i waiting\n", rank);
         // MPI_Barrier(worker);
