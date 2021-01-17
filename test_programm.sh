@@ -24,7 +24,7 @@ run_and_evaluate()
     new_evaluation_list=""
     iterator=0
 
-    echo "$programm_output" | grep "Calculating Motion Vectors and Sending only"
+    echo "$programm_output" | grep -Po "Calculating Motion Vectors and Sending only.*: \K.*ms"
 
     for part in "${evaluation_parts[@]}"
     do
