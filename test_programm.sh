@@ -96,6 +96,6 @@ do
             fi
             speed_up_string="====> Speed up: $speed_up%"
         fi
-        echo "    $(printf "%-35s\n" "${evaluation_parts[$iterator_values-1]}"): $milliseconds ms (= $seconds s) $(printf "%30s\n" "$speed_up_string")"
+        echo "    $(printf "%-35s\n" "${evaluation_parts[$iterator_values-1]}"): $milliseconds ms (= $seconds s) $speed_up_string"
     done
 done
