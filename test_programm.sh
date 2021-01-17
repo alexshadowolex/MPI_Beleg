@@ -2,8 +2,6 @@
 
 evaluation_parts=(
     "Reading File Data"
-    "Calculating Motion Vectors and Sending only"
-    "Evaluating sended Values"
     "Calculating Motion Vectors TOTAL"
     "Encoding Files"
     "Ending Program"
@@ -23,8 +21,6 @@ run_and_evaluate()
 
     new_evaluation_list=""
     iterator=0
-
-    echo "$programm_output" | grep -Po "Calculating Motion Vectors and Sending only.*: \K.*ms"
 
     for part in "${evaluation_parts[@]}"
     do
@@ -88,7 +84,7 @@ do
         seconds=$(echo "$combined_values" | cut -d"|" -f2)
         speed_up=""
         speed_up_string=""
-        if [ $iterator_processors -eq $RANGE_START_PROCESSORS ]
+        if [ $iterator_processors -eq $RANGE_START_PROCESSORS -o -z "$iterator_processors" ]
         then
     	    reference_times[$iterator_values-1]=$milliseconds
         else
