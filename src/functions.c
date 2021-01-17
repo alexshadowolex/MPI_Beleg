@@ -348,6 +348,10 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
             MPI_Request request;
             MPI_Ialltoall(send_alltoall, 1, MPI_tMacro_Block_SAD, receive_alltoall, 1, MPI_tMacro_Block_SAD, MPI_COMM_WORLD, &request);
 
+            for(int i = 0; i < size_receive_alltoall; i++){
+                printf("==============Rank %i printing element %i: %f, %i - %i\n", rank, i, receive_alltoall[i].value_SAD, receive_alltoall[i].x_width, receive_alltoall[i].y_height);
+            }
+
             if(receive_alltoall[0].value_SAD > current_values.value_SAD){
                 send_alltoall[0].value_SAD = current_values.value_SAD;
                 send_alltoall[0].x_width = current_values.x_width;
@@ -386,7 +390,8 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
         }
         append_element(all_macro_block_SAD, macro_block_SAD);
         printf("Rank %i waiting\n", rank);
-        MPI_Barrier(worker);
+        // MPI_Barrier(worker);
+        MPI_Barrier();
         printf("Rank %i continuing\n", rank);
     }
 
