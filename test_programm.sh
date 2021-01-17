@@ -92,7 +92,7 @@ do
             then
                 speed_up=0
             else
-                speed_up=$((200 \* ${reference_times[$iterator_values-1]}-$milliseconds / ${reference_times[$iterator_values-1]} % 2 + 100 \* ${reference_times[$iterator_values-1]}-$milliseconds / ${reference_times[$iterator_values-1]}))
+                speed_up=$(echo "((${reference_times[$iterator_values-1]}-$milliseconds)*100)/${reference_times[$iterator_values-1]}" | bc -l)
             fi
             speed_up_string="====> Speed up: $speed_up%"
         fi
