@@ -45,15 +45,15 @@ distance_vectors=$2
 
 if [ -z "$1" -o -z "$2" ]
 then
-    echo "Please provide a command line argument for each \"Range End Processors\" (< $RANGE_START_PROCESSORS) and \"Distance Motion Vectors\" (<= 0)"
+    echo "Please provide a command line argument for each \"Range End Processors\" (> $RANGE_START_PROCESSORS) and \"Distance Motion Vectors\" (>= 0)"
     exit 1
 fi
 
 if [ $1 -lt $RANGE_START_PROCESSORS -o $2 -lt 0 ]
 then
     echo "Please provide a valid value for each command line argument:"
-    echo "Range End Processors <= $RANGE_START_PROCESSORS"
-    echo "Range End Vectors <= 0"
+    echo "Range End Processors > $RANGE_START_PROCESSORS"
+    echo "Range End Vectors >= 0"
     exit 1
 fi
 
@@ -67,7 +67,7 @@ do
     run_and_evaluate "$iterator_processor" "$distance_vectors"
 done
 
-reference_time_programm=""
+reference_times=()
 for (( iterator_processors=$RANGE_START_PROCESSORS; iterator_processors<=$range_end_processors; iterator_processors++ ))
 do
     if [ $iterator_processors -eq $RANGE_START_PROCESSORS ]
@@ -88,13 +88,13 @@ do
         speed_up_string=""
         if [ $iterator_processors -eq $RANGE_START_PROCESSORS ]
         then
-    	    reference_time_programm=$milliseconds
+    	    reference_times[$iterator_values-1]=$milliseconds
         else
-            if [ $(echo "$reference_time_programm == 0" |bc -l) ]
+            if [ $(echo "${reference_times[$iterator_values-1]} == 0" |bc -l) ]
             then
                 speed_up=0
             else
-                speed_up=$(echo "(milliseconds-reference_time_programm)*100/reference_time_programm" | bc)
+                speed_up=$(echo "(milliseconds-${reference_times[$iterator_values-1]})*100/${reference_times[$iterator_values-1]}" | bc)
             fi
             speed_up_string="=> Speed up: $speed_up%"
         fi
