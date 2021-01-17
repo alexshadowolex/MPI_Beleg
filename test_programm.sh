@@ -94,7 +94,7 @@ do
             else
                 speed_up=$(printf "%0.3f\n" $(echo "((${reference_times[$iterator_values-1]}-$milliseconds)*100)/${reference_times[$iterator_values-1]}" | bc -l))
             fi
-            speed_up_string="====> Speed up: $speed_up%"
+            speed_up_string=$(printf "%30s\n" "====> Speed up: $speed_up%")
         fi
         echo "    ${evaluation_parts[$iterator_values-1]}: $milliseconds ms (= $seconds s) $speed_up_string"
     done
