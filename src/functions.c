@@ -285,7 +285,6 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
         int current_motion_vector_iteration;
         int found_minimal_SAD = 0;
 
-        int rank_has_best_SAD_value = 1;
         // int size_receive_alltoall = amount_processes == 1 ? 1 : amount_processes - 1;
         int size_receive_alltoall = amount_processes == 1 ? 1 : amount_processes - 1;
         // get_next_motion_vector will return values for the iteration
@@ -294,13 +293,11 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
             current_motion_vector_iteration < range_end && !found_minimal_SAD; 
             current_motion_vector_iteration++){
 
-            tTMP_Macro_Block_SAD * receive_alltoall = malloc(size_receive_alltoall * sizeof(tTMP_Macro_Block_SAD));
-
             tPixel_index next_motion_vector = get_next_motion_vector(current_motion_vector_iteration);
-            tTMP_Macro_Block_SAD current_values;
-            current_values.x_width = next_motion_vector.x_width;
-            current_values.y_height = next_motion_vector.y_height;
-            current_values.value_SAD = 0;
+
+            int current_x_width_motion = next_motion_vector.x_width;
+            int current_y_height_motion = next_motion_vector.y_height;
+            float current_SAD = 0;
             int exceeded_minimal_sad = 0;
             // Calculate minimal SAD and save the value and the fitting distance motion vector
             // Iterate over all pixels in a macro block (SIZE_MACRO_BLOCK x SIZE_MACRO_BLOCK)
@@ -312,13 +309,13 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
                     y_current_height_macro_block++){
                     
                     // Get current pixeldata from ref_picture
-                    tPixel_data ref_pixel = access_file_data_array(ref_picture, x_current_width_macro_block + current_values.x_width, y_current_height_macro_block + current_values.y_height);
+                    tPixel_data ref_pixel = access_file_data_array(ref_picture, x_current_width_macro_block + current_x_width_motion, y_current_height_macro_block + current_y_height_motion);
                     // Get current pixeldata from other_picture, moved by current motion vector
                     tPixel_data other_pixel = access_file_data_array(other_picture, x_current_width_macro_block, y_current_height_macro_block);
 
                     if(!ref_pixel.initialized_correct){
                         // Means we tried to access a pixel outside of the picture
-                        current_values.value_SAD += INT_MAX / 2;
+                        current_SAD  += INT_MAX / 2;
                         continue;
                     }
                     unsigned char ref_brightness = (unsigned char) ((30 * ref_pixel.red + 59 * ref_pixel.green + 11 * ref_pixel.blue) / 100);
@@ -331,62 +328,43 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
                         value = other_brightness - ref_brightness;
                     }
                     // Add to the current_SAD-Value. If it already exceeded the mininmal SAD value, we can stop checking this motion vector
-                    current_values.value_SAD += (int) value;
+                    current_SAD  += (int) value;
+                    if(current_SAD > minimal_SAD){
+                        exceeded_minimal_sad = 1;
+                    }
                 }
             }
             // Comparing minimal sad with the current vector and minimal SAD
-            if(current_values.value_SAD == 0){
+            if(current_SAD == 0){
                 // Will stop the iterations, 0 is the total minimum
                 found_minimal_SAD = 1;
             }
 
-            tTMP_Macro_Block_SAD * send_alltoall = malloc(size_receive_alltoall * sizeof(tTMP_Macro_Block_SAD));
-            send_alltoall[rank - 1].value_SAD = current_values.value_SAD;
-            send_alltoall[rank - 1].x_width = current_values.x_width;
-            send_alltoall[rank - 1].y_height = current_values.y_height;
-
-            MPI_Request request;
-            MPI_Ialltoall(send_alltoall, 1, MPI_tMacro_Block_SAD, receive_alltoall, 1, MPI_tMacro_Block_SAD, MPI_COMM_WORLD, &request);
-
-            int iterator_alltoall;
-            rank_has_best_SAD_value = 1;
-            for(iterator_alltoall = 0; iterator_alltoall < size_receive_alltoall; iterator_alltoall++){
-                printf("==============Rank %i printing element %i: %f, %i - %i\n", rank, iterator_alltoall, receive_alltoall[iterator_alltoall].value_SAD, receive_alltoall[iterator_alltoall].x_width, receive_alltoall[iterator_alltoall].y_height);
-                if(iterator_alltoall == rank - 1){
-                    continue;
-                }
-                if(receive_alltoall[iterator_alltoall].value_SAD < current_values.value_SAD){
-                    rank_has_best_SAD_value = 0;
-                }
-            }
-
-            if(rank_has_best_SAD_value){
-                minimal_SAD = current_values.value_SAD;
-                x_width_motion = current_values.x_width;
-                y_height_motion = current_values.y_height;
+            if(current_SAD < minimal_SAD){
+                minimal_SAD = current_SAD;
+                x_width_motion = current_x_width_motion;
+                y_height_motion = current_y_height_motion;
             }
 
             // Save the lowest sad Value and the fitting motion vector
 #ifdef TEST_SAD_CALC
                 xprintf(("Found new minimal SAD: %f\n", current_values.value_SAD));
 #endif
-            free(send_alltoall);
-            free(receive_alltoall);
         }
 #ifdef TEST_SAD_CALC
         printf("Current macro block: %i\nMotion Vector: x_width = %i, y_height = %i\nSAD-value: %f\n", current_macro_block, x_width_motion, y_height_motion, minimal_SAD);
 #endif
         // Add vector for macro block here
         tMacro_Block_SAD * macro_block_SAD = malloc(sizeof(tMacro_Block_SAD));
-        if(rank_has_best_SAD_value){
-            tPixel_index motion_vector = {x_width_motion, y_height_motion};
+        // if(rank_has_best_SAD_value){
+        //     tPixel_index motion_vector = {x_width_motion, y_height_motion};
             
-            macro_block_SAD->value_SAD = minimal_SAD;
-            macro_block_SAD->motion_vector = motion_vector;
-            printf("Vector: %i-%i, Value: %f\n", motion_vector.x_width, motion_vector.y_height, minimal_SAD);
-        } else {
-            macro_block_SAD = NULL;
-        }
+        //     macro_block_SAD->value_SAD = minimal_SAD;
+        //     macro_block_SAD->motion_vector = motion_vector;
+        //     printf("Vector: %i-%i, Value: %f\n", motion_vector.x_width, motion_vector.y_height, minimal_SAD);
+        // } else {
+        //     macro_block_SAD = NULL;
+        // }
         append_element(all_macro_block_SAD, macro_block_SAD);
         printf("Rank %i waiting\n", rank);
         // MPI_Barrier(worker);
