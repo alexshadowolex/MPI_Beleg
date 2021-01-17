@@ -88,7 +88,7 @@ do
         then
     	    reference_times[$iterator_values-1]=$milliseconds
         else
-            echo "$(echo "${reference_times[$iterator_values-1]} == 0" |bc -l)"
+            echo "$(echo "${reference_times[$iterator_values-1]} != 0" |bc -l)"
             if [ $(echo "${reference_times[$iterator_values-1]} == 0" |bc -l) ]
             then
                 echo "Speedup 0"
