@@ -94,7 +94,7 @@ do
             else
                 # speed_up=$(awk "BEGIN { pc=(${reference_times[$iterator_values-1]}-milliseconds)*100/${reference_times[$iterator_values-1]}; print pc}")
                 # percent=$(( 100 * (${reference_times[$iterator_values-1]}-milliseconds) / ${reference_times[$iterator_values-1]} + (1000 * (${reference_times[$iterator_values-1]}-milliseconds) / ${reference_times[$iterator_values-1]} % 10 >= 5 ? 1 : 0) ))
-                speed_up=$(echo "100 * (${reference_times[$iterator_values-1]}-milliseconds) / ${reference_times[$iterator_values-1]} + (1000 * (${reference_times[$iterator_values-1]}-milliseconds) / ${reference_times[$iterator_values-1]} % 10 >= 5 ? 1 : 0)" | bc)
+                speed_up=$(echo "100 * (${reference_times[$iterator_values-1]}-milliseconds) / ${reference_times[$iterator_values-1]} + (1000 * (${reference_times[$iterator_values-1]}-milliseconds) / ${reference_times[$iterator_values-1]}" | bc) % 10 >= 5 ? 1 : 0)
             fi
             speed_up_string="====> Speed up: $speed_up%"
         fi
