@@ -286,13 +286,14 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
         int found_minimal_SAD = 0;
 
         int rank_has_best_SAD_value = 1;
-        int size_alltoall_buffer = amount_processes == 1 ? 1 : amount_processes - 1;
-        tTMP_Macro_Block_SAD alltoall_buffer[size_alltoall_buffer];
+        int size_receive_alltoall = amount_processes == 1 ? 1 : amount_processes - 1;
         // get_next_motion_vector will return values for the iteration
         // amount_motion_vectors is the amount of motion vectors that have to get tested
         for(current_motion_vector_iteration = range_start; 
             current_motion_vector_iteration < range_end && !found_minimal_SAD; 
             current_motion_vector_iteration++){
+
+            tTMP_Macro_Block_SAD * receive_alltoall = malloc(size_receive_alltoall * sizeof(tTMP_Macro_Block_SAD));
 
             tPixel_index next_motion_vector = get_next_motion_vector(current_motion_vector_iteration);
             tTMP_Macro_Block_SAD current_values;
@@ -330,16 +331,6 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
                     }
                     // Add to the current_SAD-Value. If it already exceeded the mininmal SAD value, we can stop checking this motion vector
                     current_values.value_SAD += (int) value;
-                    MPI_Request request;
-                    MPI_Ialltoall(&current_values, 1, MPI_tMacro_Block_SAD, &alltoall_buffer, 1, MPI_tMacro_Block_SAD, MPI_COMM_WORLD, &request);
-                    int alltoall_iterator;
-                    for(alltoall_iterator = 0; alltoall_iterator < size_alltoall_buffer; alltoall_iterator++){
-                        if(current_motion_vector_iteration == range_start) printf("%i current_macro_block: Current SAD: %f, Current X: %i, Current y: %i, Alltoall SAD: %f\n",current_macro_block, current_values.value_SAD, current_values.x_width, current_values.y_height, alltoall_buffer[alltoall_iterator].value_SAD);
-                        if(alltoall_buffer[alltoall_iterator].value_SAD < current_values.value_SAD){
-                            exceeded_minimal_sad = 1;
-                            break;
-                        }
-                    }
                 }
             }
             // Comparing minimal sad with the current vector and minimal SAD
@@ -348,20 +339,22 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
                 found_minimal_SAD = 1;
             }
 
-            MPI_Alltoall(&current_values, 1, MPI_tMacro_Block_SAD, &alltoall_buffer, 1, MPI_tMacro_Block_SAD, MPI_COMM_WORLD);
+            tTMP_Macro_Block_SAD * send_alltoall = malloc(size_receive_alltoall * sizeof(tTMP_Macro_Block_SAD));
+            send_alltoall[rank].value_SAD = current_values.value_SAD;
+            send_alltoall[rank].x_width = current_values.x_width;
+            send_alltoall[rank].y_height = current_values.y_height;
 
-            int alltoall_iterator;
-            for(alltoall_iterator = 0; alltoall_iterator < size_alltoall_buffer; alltoall_iterator++){
-                if(current_values.value_SAD > alltoall_buffer[alltoall_iterator].value_SAD){
-                    rank_has_best_SAD_value = 0;
-                }
-                if(current_values.value_SAD == alltoall_buffer[alltoall_iterator].value_SAD && current_values.value_SAD == 0){
-                    if(current_values.x_width != 0 || current_values.y_height != 0){
-                        rank_has_best_SAD_value = 0;
-                    } else {
-                        rank_has_best_SAD_value = 1;
-                    }
-                }
+            MPI_Request request;
+            MPI_Ialltoall(send_alltoall, 1, MPI_tMacro_Block_SAD, receive_alltoall, 1, MPI_tMacro_Block_SAD, MPI_COMM_WORLD, &request);
+
+            if(receive_alltoall[0].value_SAD > current_values.value_SAD){
+                send_alltoall[0].value_SAD = current_values.value_SAD;
+                send_alltoall[0].x_width = current_values.x_width;
+                send_alltoall[0].y_height = current_values.y_height;
+
+                MPI_Ialltoall(send_alltoall, 1, MPI_tMacro_Block_SAD, receive_alltoall, 1, MPI_tMacro_Block_SAD, MPI_COMM_WORLD, &request);
+            }else{
+                rank_has_best_SAD_value = 0;
             }
             if(rank_has_best_SAD_value){
                 minimal_SAD = current_values.value_SAD;
@@ -373,6 +366,8 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
 #ifdef TEST_SAD_CALC
                 xprintf(("Found new minimal SAD: %f\n", current_values.value_SAD));
 #endif
+            free(send_alltoall);
+            free(receive_alltoall);
         }
 #ifdef TEST_SAD_CALC
         printf("Current macro block: %i\nMotion Vector: x_width = %i, y_height = %i\nSAD-value: %f\n", current_macro_block, x_width_motion, y_height_motion, minimal_SAD);
@@ -389,6 +384,7 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
             macro_block_SAD = NULL;
         }
         append_element(all_macro_block_SAD, macro_block_SAD);
+        MPI_Barrier(worker);
     }
 
     return all_macro_block_SAD;

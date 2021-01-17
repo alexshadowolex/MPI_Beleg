@@ -47,6 +47,7 @@ typedef struct sTMP_Macro_Block_SAD{
 }tTMP_Macro_Block_SAD;
 
 MPI_Datatype MPI_tMacro_Block_SAD;
+MPI_Comm worker;
 
 tList * time_evaluation_list;
 int rank, amount_processes;

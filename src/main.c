@@ -29,6 +29,8 @@ int main(int argc, char ** argv){
         MPI_Abort(MPI_COMM_WORLD ,EXIT_FAILURE);
     }
 
+    MPI_Comm_split(MPI_COMM_WORLD, (rank == 0), rank, &worker);
+
     // Initilize all used MPI_Datatypes
     init_mpi_data_types();
     
