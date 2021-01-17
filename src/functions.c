@@ -366,7 +366,7 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
         MPI_Alltoall(send_alltoall, 1, MPI_tMacro_Block_SAD, receive_alltoall, 1, MPI_tMacro_Block_SAD, worker);
         int iterator_alltoall;
         int rank_has_best_SAD_value = 1;
-        for(iterator_alltoall = 0; iterator_alltoall < size_receive_alltoall; iterator_alltoall){
+        for(iterator_alltoall = 0; iterator_alltoall < size_receive_alltoall; iterator_alltoall++){
             if(rank == 1) printf("Iterating over values. Block %i from worker_rank %i: %f; %i - %i\n", current_macro_block, iterator_alltoall, receive_alltoall[iterator_alltoall].value_SAD, receive_alltoall[iterator_alltoall].x_width, receive_alltoall[iterator_alltoall].y_height);
             if(iterator_alltoall == rank - 1){
                 continue;
