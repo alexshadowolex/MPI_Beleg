@@ -39,7 +39,7 @@ distance_vectors=$2
 
 if [ -z "$1" -o -z "$2" ]
 then
-    echo "Please provide a command line argument for each \"Range End Processors\" (< $RANGE_START_PROCESSORS) and \"Distance Motion Vectors\" (<= 0)"
+    echo "Please provide a command line argument for each \"Range End Processors\" (> $RANGE_START_PROCESSORS) and \"Distance Motion Vectors\" (>= 0)"
     exit 1
 fi
 
