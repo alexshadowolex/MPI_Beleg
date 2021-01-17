@@ -24,6 +24,8 @@ run_and_evaluate()
     new_evaluation_list=""
     iterator=0
 
+    echo "$programm_output"
+
     for part in "${evaluation_parts[@]}"
     do
         milliseconds=$(echo "$programm_output" | grep -Po "$part : \K.*ms" | grep -o "[0-9]\+\\.[0-9]\+")
