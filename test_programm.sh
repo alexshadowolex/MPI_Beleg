@@ -47,7 +47,7 @@ then
     exit 1
 fi
 
-if [ $1 -lt $RANGE_START_PROCESSORS -o $2 -lt 0 ]
+if [ $1 -le $RANGE_START_PROCESSORS -o $2 -lt 0 ]
 then
     echo "Please provide a valid value for each command line argument:"
     echo "Range End Processors > $RANGE_START_PROCESSORS"
