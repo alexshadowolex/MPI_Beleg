@@ -286,7 +286,8 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
         int found_minimal_SAD = 0;
 
         int rank_has_best_SAD_value = 1;
-        int size_receive_alltoall = amount_processes == 1 ? 1 : amount_processes - 1;
+        // int size_receive_alltoall = amount_processes == 1 ? 1 : amount_processes - 1;
+        int size_receive_alltoall = amount_processes == 1 ? 2 : amount_processes;
         // get_next_motion_vector will return values for the iteration
         // amount_motion_vectors is the amount of motion vectors that have to get tested
         for(current_motion_vector_iteration = range_start; 
