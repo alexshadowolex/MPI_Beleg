@@ -24,7 +24,7 @@ run_and_evaluate()
     new_evaluation_list=""
     iterator=0
 
-    echo "$programm_output"
+    echo "$programm_output" | grep "Reading File Data"
 
     for part in "${evaluation_parts[@]}"
     do
