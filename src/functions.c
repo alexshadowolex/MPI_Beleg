@@ -351,7 +351,7 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
             int iterator_alltoall;
             rank_has_best_SAD_value = 1;
             for(iterator_alltoall = 0; iterator_alltoall < size_receive_alltoall; iterator_alltoall++){
-                printf("==============Rank %i printing element %i: %f, %i - %i\n", rank, iterator_alltoall, receive_alltoall[i].value_SAD, receive_alltoall[i].x_width, receive_alltoall[i].y_height);
+                printf("==============Rank %i printing element %i: %f, %i - %i\n", rank, iterator_alltoall, receive_alltoall[iterator_alltoall].value_SAD, receive_alltoall[iterator_alltoall].x_width, receive_alltoall[iterator_alltoall].y_height);
                 if(iterator_alltoall == rank - 1){
                     continue;
                 }
