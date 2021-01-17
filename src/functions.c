@@ -287,7 +287,7 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
 
         int rank_has_best_SAD_value = 1;
         // int size_receive_alltoall = amount_processes == 1 ? 1 : amount_processes - 1;
-        int size_receive_alltoall = amount_processes == 1 ? 2 : amount_processes;
+        int size_receive_alltoall = amount_processes == 1 ? 1 : amount_processes - 1;
         // get_next_motion_vector will return values for the iteration
         // amount_motion_vectors is the amount of motion vectors that have to get tested
         for(current_motion_vector_iteration = range_start; 
@@ -341,26 +341,25 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
             }
 
             tTMP_Macro_Block_SAD * send_alltoall = malloc(size_receive_alltoall * sizeof(tTMP_Macro_Block_SAD));
-            send_alltoall[rank].value_SAD = current_values.value_SAD;
-            send_alltoall[rank].x_width = current_values.x_width;
-            send_alltoall[rank].y_height = current_values.y_height;
+            send_alltoall[rank - 1].value_SAD = current_values.value_SAD;
+            send_alltoall[rank - 1].x_width = current_values.x_width;
+            send_alltoall[rank - 1].y_height = current_values.y_height;
 
             MPI_Request request;
             MPI_Ialltoall(send_alltoall, 1, MPI_tMacro_Block_SAD, receive_alltoall, 1, MPI_tMacro_Block_SAD, MPI_COMM_WORLD, &request);
 
-            for(int i = 0; i < size_receive_alltoall; i++){
-                printf("==============Rank %i printing element %i: %f, %i - %i\n", rank, i, receive_alltoall[i].value_SAD, receive_alltoall[i].x_width, receive_alltoall[i].y_height);
+            int iterator_alltoall;
+            rank_has_best_SAD_value = 1;
+            for(iterator_alltoall = 0; iterator_alltoall < size_receive_alltoall; iterator_alltoall++){
+                printf("==============Rank %i printing element %i: %f, %i - %i\n", rank, iterator_alltoall, receive_alltoall[i].value_SAD, receive_alltoall[i].x_width, receive_alltoall[i].y_height);
+                if(iterator_alltoall == rank - 1){
+                    continue;
+                }
+                if(receive_alltoall[iterator_alltoall].value_SAD < current_values.value_SAD){
+                    rank_has_best_SAD_value = 0;
+                }
             }
 
-            if(receive_alltoall[0].value_SAD > current_values.value_SAD){
-                send_alltoall[0].value_SAD = current_values.value_SAD;
-                send_alltoall[0].x_width = current_values.x_width;
-                send_alltoall[0].y_height = current_values.y_height;
-
-                MPI_Ialltoall(send_alltoall, 1, MPI_tMacro_Block_SAD, receive_alltoall, 1, MPI_tMacro_Block_SAD, MPI_COMM_WORLD, &request);
-            }else{
-                rank_has_best_SAD_value = 0;
-            }
             if(rank_has_best_SAD_value){
                 minimal_SAD = current_values.value_SAD;
                 x_width_motion = current_values.x_width;
