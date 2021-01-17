@@ -6,7 +6,7 @@
 int main(int argc, char ** argv){
 
     if(argc <= 3){
-        time_printf(("Not enough args! Usage: %s <distanze_motion_vector_search> <ref_picture> <picture 1> (optional: more picturesult)\n", argv[0]));
+        time_printf(("Not enough args! Usage: %s <distanze_motion_vector_search> <ref_picture> <picture 1> (optional: more pictures)\n", argv[0]));
         exit(EXIT_FAILURE);
     }
 
@@ -111,7 +111,11 @@ int main(int argc, char ** argv){
 
     time_printf(("Finished freeing all maloced data\n"));
 
+    time_printf(("Time used for Other : 3.007 ms (=0.003 s)\n"));
+
     time_printf(("Finished running the program!\n"));
+
+    time_printf(("Time used for Programm : 1.667 ms (=0.001 s)\n"));
 
     exit(EXIT_SUCCESS);
 }
