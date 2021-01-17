@@ -17,7 +17,7 @@ run_and_evaluate()
     amount_processes="$1"
     amount_vectors="$2"
 
-    programm_output=$(mpiexec -n $amount_processes ./bin/main $amount_vectors "files/test_pictures/serienbild1.jpg" "files/test_pictures/serienbild2.jpg")
+    programm_output=$(mpiexec -n "$amount_processes" ./bin/main "$amount_vectors" "files/test_pictures/serienbild1.jpg" "files/test_pictures/serienbild2.jpg")
 
     new_evaluation_list=""
     iterator=0
@@ -41,13 +41,13 @@ RANGE_START_PROCESSORS=1
 range_end_processors=$1
 distance_vectors=$2
 
-if [ -z "$1" -o -z "$2" ]
+if [ -z "$1" ] || [ -z "$2" ]
 then
     echo "Please provide a command line argument for each \"Range End Processors\" (> $RANGE_START_PROCESSORS) and \"Distance Motion Vectors\" (>= 0)"
     exit 1
 fi
 
-if [ $1 -le $RANGE_START_PROCESSORS -o $2 -lt 0 ]
+if [ "$1" -le "$RANGE_START_PROCESSORS" ] || [ "$2" -lt 0 ]
 then
     echo "Please provide a valid value for each command line argument:"
     echo "Range End Processors > $RANGE_START_PROCESSORS"
@@ -68,7 +68,7 @@ done
 reference_times=()
 for (( iterator_processors=$RANGE_START_PROCESSORS; iterator_processors<=$range_end_processors; iterator_processors++ ))
 do
-    if [ $iterator_processors -eq $RANGE_START_PROCESSORS ]
+    if [ "$iterator_processors" -eq "$RANGE_START_PROCESSORS" ]
     then
         echo "=========================================================="
         echo "Evaluation for Usage with Motion Vector Distance of $distance_vectors"
@@ -79,20 +79,20 @@ do
     values=${list_evaluation[$iterator_processors - $RANGE_START_PROCESSORS]}
     for (( iterator_values=1; iterator_values<${#evaluation_parts[@]}+1; iterator_values++ ))
     do
-        combined_values=$(echo "$values" | cut -d";" -f$iterator_values)
+        combined_values=$(echo "$values" | cut -d";" -f"$iterator_values")
         milliseconds=$(echo "$combined_values" | cut -d"|" -f1)
         seconds=$(echo "$combined_values" | cut -d"|" -f2)
         speed_up=""
         speed_up_string=""
-        if [ $iterator_processors -eq $RANGE_START_PROCESSORS -o -z "$iterator_processors" ]
+        if [ "$iterator_processors" -eq $RANGE_START_PROCESSORS ] || [ -z "$iterator_processors" ]
         then
     	    reference_times[$iterator_values-1]=$milliseconds
         else
-            if [ 1 -eq $(echo "${reference_times[$iterator_values-1]} == 0" |bc -l) ]
+            if [ 1 -eq "$(echo "${reference_times[$iterator_values-1]} == 0" |bc -l)" ]
             then
                 speed_up=0
             else
-                speed_up=$(printf "%0.3f\n" $(echo "((${reference_times[$iterator_values-1]}-$milliseconds)*100)/${reference_times[$iterator_values-1]}" | bc -l))
+                speed_up="$(printf "%0.3f\n" "$(echo "((${reference_times[$iterator_values-1]}-$milliseconds)*100)/${reference_times[$iterator_values-1]}" | bc -l)")"
             fi
             speed_up_string="====> Speed up: $speed_up%"
         fi
