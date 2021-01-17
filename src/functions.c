@@ -396,8 +396,8 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
         }
         // printf("Rank %i found for macro block %i following values: %f; %i - %i\n", rank, current_macro_block, minimal_SAD, x_width_motion, y_height_motion);
         append_element(all_macro_block_SAD, macro_block_SAD);
-        printf("Rank %i waiting\n", rank);
-        printf("Rank %i continuing\n", rank);
+        // printf("Rank %i waiting\n", rank);
+        // printf("Rank %i continuing\n", rank);
     }
 
     return all_macro_block_SAD;
