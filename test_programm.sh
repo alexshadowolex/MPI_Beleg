@@ -13,8 +13,7 @@ run_and_evaluate()
     amount_processes="$1"
     amount_vectors="$2"
 
-    # ./bin/main "$1" "$2" "files/test_pictures/serienbild1.jpg" "files/test_pictures/serienbild2.jpg"
-    programm_output=$(./bin/main "$2" "files/test_pictures/serienbild1.jpg" "files/test_pictures/serienbild2.jpg")
+    programm_output=$(./bin/main $amount_vectors "files/test_pictures/serienbild1.jpg" "files/test_pictures/serienbild2.jpg")
 
     new_evaluation_list=""
     iterator=0
