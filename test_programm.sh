@@ -24,12 +24,12 @@ run_and_evaluate()
     new_evaluation_list=""
     iterator=0
 
-    echo "$programm_output" | grep "Reading File Data"
+    echo "$programm_output" | grep "Calculating Motion Vectors and Sending only"
 
     for part in "${evaluation_parts[@]}"
     do
-        milliseconds=$(echo "$programm_output" | grep -Po "$part.* : \K.*ms" | grep -o "[0-9]\+\\.[0-9]\+")
-        seconds=$(echo "$programm_output" | grep -Po "$part.* : .*\\(=\K.*s" | grep -o "[0-9]\+\\.[0-9]\+")
+        milliseconds=$(echo "$programm_output" | grep -Po "$part.*: \K.*ms" | grep -o "[0-9]\+\\.[0-9]\+")
+        seconds=$(echo "$programm_output" | grep -Po "$part.*: .*\\(=\K.*s" | grep -o "[0-9]\+\\.[0-9]\+")
         
         new_evaluation_list+="$milliseconds|$seconds;"
         let iterator=$iterator+1
