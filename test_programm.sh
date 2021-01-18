@@ -69,6 +69,8 @@ done
 
 reference_times=()
 total_output=""
+best_time=""
+best_amount_processors=""
 for (( iterator_processors=$RANGE_START_PROCESSORS; iterator_processors<=$range_end_processors; iterator_processors++ ))
 do
     if [ "$iterator_processors" -eq "$RANGE_START_PROCESSORS" ]
@@ -93,6 +95,15 @@ do
             milliseconds_calculation=$milliseconds
         fi
 
+        if [ "${evaluation_parts[$iterator_values-1]}" == "Total Program" ]
+        then
+            if [ -z "$best_time" || $best_time -gt $seconds ]
+            then
+                best_time=$seconds
+                best_amount_processors=$iterator_processors
+            fi
+        fi
+
         speed_up=""
         speed_up_string=""
         if [ "$iterator_processors" -eq $RANGE_START_PROCESSORS ] || [ -z "$iterator_processors" ]
@@ -111,7 +122,8 @@ do
         echo "$output_string"
         total_output+="$output_string \n"
     done
-    extra_info="Macro Blocks per Second: $(printf "%0.3f" "$(echo "$amount_macro_blocks/$seconds_calculation" | bc -l)") | Macro Blocks per milliseconds: $(printf "%0.3f" "$(echo "$amount_macro_blocks/$milliseconds_calculation" | bc -l)")"
+    extra_info="    Macro Blocks per Second: $(printf "%0.3f" "$(echo "$amount_macro_blocks/$seconds_calculation" | bc -l)") | Macro Blocks per milliseconds: $(printf "%0.3f" "$(echo "$amount_macro_blocks/$milliseconds_calculation" | bc -l)")"
+    extra_info+="\n    Best time: $best_time s with $best_amount_processors processors"
     echo "$extra_info"
     total_output+=" $extra_info\n"
 done
