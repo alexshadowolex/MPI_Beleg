@@ -42,7 +42,7 @@ RANGE_START_PROCESSORS=1
 range_end_processors=$1
 distance_vectors=$2
 
-if [ !-z "$3" ]
+if [ ! -z "$3" ]
 then
     with_machinefile="-f machinefile"
 fi
