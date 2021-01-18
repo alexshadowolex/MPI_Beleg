@@ -112,8 +112,7 @@ do
     let add_iterator=$add_iterator+1
 done
 
-mkdir -p "/files/logs"
-
 file_name="/files/logs/${file_name}_nr_${add_iterator}.log"
 
 touch "$file_name"
+echo "$total_output" | tee "$file_name"
