@@ -88,10 +88,20 @@ do
         combined_values=$(echo "$values" | cut -d";" -f"$iterator_values")
         milliseconds=$(echo "$combined_values" | cut -d"|" -f1)
         seconds=$(echo "$combined_values" | cut -d"|" -f2)
-        if [ "${evaluation_parts[$iterator_values-1]}" == "Calculating Motion Vectors" ]
+        if [ "${evaluation_parts[$iterator_values-1]}" == "Calculating Motion Vectors TOTAL" ]
         then
-            seconds_calculation=$seconds
-            milliseconds_calculation=$milliseconds
+            if [ 1 -eq "$(echo "$seconds == 0" | bc -l)" ]
+            then
+                seconds_calculation=$seconds
+            else
+                seconds_calculation=100
+            fi
+            if [ 1 -eq "$(echo "$milliseconds == 0" | bc -l)" ]
+            then
+                milliseconds_calculation=$milliseconds
+            else
+                milliseconds_calculation=100
+            fi
         fi
 
         if [ "${evaluation_parts[$iterator_values-1]}" == "Total Program" ]
