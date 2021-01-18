@@ -97,7 +97,7 @@ do
 
         if [ "${evaluation_parts[$iterator_values-1]}" == "Total Program" ]
         then
-            if [ -z "$best_time" ] || [ $best_time -gt $seconds ]
+            if [ -z "$best_time" ] || [ $(echo "$best_time > $seconds" | bc -l) ]
             then
                 best_time=$seconds
                 best_amount_processors=$iterator_processors
@@ -110,7 +110,7 @@ do
         then
     	    reference_times[$iterator_values-1]=$milliseconds
         else
-            if [ 1 -eq "$(echo "${reference_times[$iterator_values-1]} == 0" |bc -l)" ]
+            if [ 1 -eq "$(echo "${reference_times[$iterator_values-1]} == 0" | bc -l)" ]
             then
                 speed_up=0
             else
