@@ -97,7 +97,7 @@ do
 
         if [ "${evaluation_parts[$iterator_values-1]}" == "Total Program" ]
         then
-            if [ -z "$best_time" ] || [ $(echo "$best_time > $seconds" | bc -l) ]
+            if [ -z "$best_time" ] || [ 1 -eq $(echo "$best_time > $seconds" | bc -l) ]
             then
                 best_time=$seconds
                 best_amount_processors=$iterator_processors
