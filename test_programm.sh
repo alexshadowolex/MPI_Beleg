@@ -65,10 +65,10 @@ do
     run_and_evaluate "$iterator_processor" "$distance_vectors"
 done
 
-reference_times=()
+total_output=""
 for (( iterator_processors=$RANGE_START_PROCESSORS; iterator_processors<=$range_end_processors; iterator_processors++ ))
 do
-    if [ $iterator_processors -eq $RANGE_START_PROCESSORS ]
+    if [ "$iterator_processors" -eq "$RANGE_START_PROCESSORS" ]
     then
         echo "=========================================================="
         echo "Evaluation for Usage with Motion Vector Distance of $distance_vectors"
@@ -79,23 +79,39 @@ do
     values=${list_evaluation[$iterator_processors - $RANGE_START_PROCESSORS]}
     for (( iterator_values=1; iterator_values<${#evaluation_parts[@]}+1; iterator_values++ ))
     do
-        combined_values=$(echo "$values" | cut -d";" -f$iterator_values)
+        combined_values=$(echo "$values" | cut -d";" -f"$iterator_values")
         milliseconds=$(echo "$combined_values" | cut -d"|" -f1)
         seconds=$(echo "$combined_values" | cut -d"|" -f2)
         speed_up=""
         speed_up_string=""
-        if [ $iterator_processors -eq $RANGE_START_PROCESSORS -o -z "$iterator_processors" ]
+        if [ "$iterator_processors" -eq $RANGE_START_PROCESSORS ] || [ -z "$iterator_processors" ]
         then
     	    reference_times[$iterator_values-1]=$milliseconds
         else
-            if [ 1 -eq $(echo "${reference_times[$iterator_values-1]} == 0" |bc -l) ]
+            if [ 1 -eq "$(echo "${reference_times[$iterator_values-1]} == 0" |bc -l)" ]
             then
                 speed_up=0
             else
-                speed_up=$(printf "%0.3f\n" $(echo "((${reference_times[$iterator_values-1]}-$milliseconds)*100)/${reference_times[$iterator_values-1]}" | bc -l))
+                speed_up="$(printf "%0.3f\n" "$(echo "((${reference_times[$iterator_values-1]}-$milliseconds)*100)/${reference_times[$iterator_values-1]}" | bc -l)")"
             fi
             speed_up_string="====> Speed up: $speed_up%"
         fi
-        echo "    $(printf "%-35s\n" "${evaluation_parts[$iterator_values-1]}"): $milliseconds ms (= $seconds s) $speed_up_string"
+        output_string="    $(printf "%-35s\n" "${evaluation_parts[$iterator_values-1]}"): $milliseconds ms (= $seconds s) $speed_up_string"
+        echo "$output_string"
+        total_output+="$output_string \n"
     done
 done
+
+file_name="1-${range_end_processors}_${distance_vectors}"
+add_iterator=1
+test_value="files/logs/${file_name}.log"
+while [ -e "$test_value" ]
+do
+    test_value="files/logs/${file_name}_nr_${add_iterator}.log"
+    let add_iterator=$add_iterator+1
+done
+
+file_name="$test_value"
+
+touch -a "$file_name"
+echo "$total_output" >> "$file_name"
