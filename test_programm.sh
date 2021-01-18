@@ -76,6 +76,7 @@ do
     fi
     echo "Used times with $iterator_processors Processors"
     
+    total_output=""
     values=${list_evaluation[$iterator_processors - $RANGE_START_PROCESSORS]}
     for (( iterator_values=1; iterator_values<${#evaluation_parts[@]}+1; iterator_values++ ))
     do
@@ -96,6 +97,21 @@ do
             fi
             speed_up_string="====> Speed up: $speed_up%"
         fi
-        echo "    $(printf "%-35s\n" "${evaluation_parts[$iterator_values-1]}"): $milliseconds ms (= $seconds s) $speed_up_string"
+        output_string="    $(printf "%-35s\n" "${evaluation_parts[$iterator_values-1]}"): $milliseconds ms (= $seconds s) $speed_up_string"
+        echo "$output_string"
+        total_output+="$output_string \n"
     done
 done
+
+file_name="1-${range_end_processors}_${distance_vectors}"
+add_iterator=1
+test_value="files/logs/${file_name}.log"
+while [ -e test_value ]
+do
+    test_value="files/logs/${file_name}_nr_${add_iterator}.log"
+    let add_iterator=$add_iterator+1
+done
+
+file_name="${file_name}_nr_${add_iterator}.log"
+
+total_output >> "$file_name"
