@@ -47,10 +47,11 @@ typedef struct sTMP_Macro_Block_SAD{
 }tTMP_Macro_Block_SAD;
 
 MPI_Datatype MPI_tMacro_Block_SAD;
-MPI_Comm worker;
+MPI_Comm worker_classes;
+
+int rank, amount_processes, worker_rank;
 
 tList * time_evaluation_list;
-int rank, amount_processes;
 
 void print_timestamp(void);
 void init_mpi_data_types(void);

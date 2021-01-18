@@ -15,6 +15,9 @@ int main(int argc, char ** argv){
     MPI_Init(&argc, &argv);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &amount_processes);
+    if(rank != MASTER_RANK){
+        worker_rank = rank - 1;
+    }
 
     if(argc <= 3){
         time_printf(("Not enough args! Usage: %s <distanze_motion_vector_search> <ref_picture> <picture 1> (optional: more picturesult)\n", argv[0]));
@@ -29,7 +32,13 @@ int main(int argc, char ** argv){
         MPI_Abort(MPI_COMM_WORLD ,EXIT_FAILURE);
     }
 
-    MPI_Comm_split(MPI_COMM_WORLD, (rank == 0), rank, &worker);
+    int amount_file_pairs = amount_files - 1;
+
+    worker_classes = malloc(amount_file_pairs * sizeof(MPI_Comm));
+    int iterator_worker_seperator;
+    for(iterator_worker_seperator = 0; iterator_worker_seperator < amount_file_pairs; iterator_worker_seperator++){
+        MPI_Comm_split(MPI_COMM_WORLD, (worker_rank % amount_file_pairs == iterator_worker_seperator && rank != MASTER_RANK), rank, &worker_classes[iterator_worker_seperator]);
+    }
 
     // Initilize all used MPI_Datatypes
     init_mpi_data_types();
