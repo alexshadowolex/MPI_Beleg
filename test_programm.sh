@@ -106,14 +106,13 @@ done
 file_name="1-${range_end_processors}_${distance_vectors}"
 add_iterator=1
 test_value="files/logs/${file_name}.log"
-while [ -e "$test_value" ]
+while [ ! -f "$test_value" ]
 do
     test_value="files/logs/${file_name}_nr_${add_iterator}.log"
     let add_iterator=$add_iterator+1
 done
 
-file_name="files/logs/${file_name}_nr_${add_iterator}.log"
+file_name="$test_value"
 
 touch -a "$file_name"
-touch -- "$file_name"
 echo "$total_output" >> "$file_name"
