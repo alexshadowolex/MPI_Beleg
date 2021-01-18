@@ -110,6 +110,7 @@ do
         output_string="    $(printf "%-35s\n" "${evaluation_parts[$iterator_values-1]}"): $milliseconds ms (= $seconds s) $speed_up_string"
         echo "$output_string"
         extra_info="Macro Blocks per Second: $(printf "%0.3f" "$(echo "$amount_macro_blocks/$seconds_calculation" | bc -l)") | Macro Blocks per milliseconds: $(printf "%0.3f" "$(echo "$amount_macro_blocks/$milliseconds_calculation" | bc -l)")"
+        echo "$extra_info"
         total_output+="$output_string \n $extra_info\n"
     done
 done
