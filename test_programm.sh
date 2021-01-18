@@ -87,7 +87,7 @@ do
         combined_values=$(echo "$values" | cut -d";" -f"$iterator_values")
         milliseconds=$(echo "$combined_values" | cut -d"|" -f1)
         seconds=$(echo "$combined_values" | cut -d"|" -f2)
-        if [ ${evaluation_parts[$iterator_values-1]} -eq "Calculating Motion Vectors" ]
+        if [ "${evaluation_parts[$iterator_values-1]}" == "Calculating Motion Vectors" ]
         then
             seconds_calculation=$seconds
             milliseconds_calculation=$milliseconds
