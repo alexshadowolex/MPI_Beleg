@@ -112,6 +112,6 @@ do
     let add_iterator=$add_iterator+1
 done
 
-file_name="${file_name}_nr_${add_iterator}.log"
+file_name="files/logs/${file_name}_nr_${add_iterator}.log"
 
-$total_output >> "$file_name"
+echo "$total_output" | tee "$file_name"
