@@ -114,5 +114,5 @@ done
 
 file_name="files/logs/${file_name}_nr_${add_iterator}.log"
 
-touch "$file_name"
-echo "$total_output" | tee "$file_name"
+touch -a "$file_name"
+echo "$total_output" >> "$file_name"
