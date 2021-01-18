@@ -92,15 +92,15 @@ do
         then
             if [ 1 -eq "$(echo "$seconds == 0" | bc -l)" ]
             then
-                seconds_calculation=$seconds
-            else
                 seconds_calculation=100
+            else
+                seconds_calculation=$seconds
             fi
             if [ 1 -eq "$(echo "$milliseconds == 0" | bc -l)" ]
             then
-                milliseconds_calculation=$milliseconds
-            else
                 milliseconds_calculation=100
+            else
+                milliseconds_calculation=$milliseconds
             fi
         fi
 
@@ -131,7 +131,7 @@ do
         echo "$output_string"
         total_output+="$output_string \n"
     done
-    extra_info="    Macro Blocks per Second: $(printf "%0.3f" "$(echo "$amount_macro_blocks/$seconds_calculation" | bc -l)") | Macro Blocks per milliseconds: $(printf "%0.3f" "$(echo "$amount_macro_blocks/$milliseconds_calculation" | bc -l)")"
+    extra_info="    Macro Blocks per Second: $(printf "%0.3f" "$(echo "$amount_macro_blocks/$   " | bc -l)") | Macro Blocks per milliseconds: $(printf "%0.3f" "$(echo "$amount_macro_blocks/$milliseconds_calculation" | bc -l)")"
     echo "$extra_info"
     total_output+=" $extra_info\n"
 done
