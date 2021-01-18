@@ -114,4 +114,4 @@ done
 
 file_name="${file_name}_nr_${add_iterator}.log"
 
-total_output >> "$file_name"
+$total_output >> "$file_name"
