@@ -91,8 +91,18 @@ do
         seconds=$(echo "$combined_values" | cut -d"|" -f2)
         if [ "${evaluation_parts[$iterator_values-1]}" == "Calculating Motion Vectors" ]
         then
-            seconds_calculation=$seconds
-            milliseconds_calculation=$milliseconds
+            if [ 1 -eq "$(echo "$seconds == 0" | bc -l)" ]
+            then
+                seconds_calculation=100
+            else
+                seconds_calculation=$seconds
+            fi
+            if [ 1 -eq "$(echo "$milliseconds == 0" | bc -l)" ]
+            then
+                milliseconds_calculation=100
+            else
+                milliseconds_calculation=$milliseconds
+            fi
         fi
 
         if [ "${evaluation_parts[$iterator_values-1]}" == "Total Program" ]
