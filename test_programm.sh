@@ -41,6 +41,8 @@ RANGE_START_PROCESSORS=1
 range_end_processors=$1
 distance_vectors=$2
 
+amount_macro_blocks=10266
+
 if [ -z "$1" ] || [ -z "$2" ]
 then
     echo "Please provide a command line argument for each \"Range End Processors\" (> $RANGE_START_PROCESSORS) and \"Distance Motion Vectors\" (>= 0)"
@@ -78,11 +80,19 @@ do
     echo "Used times with $iterator_processors Processors"
     
     values=${list_evaluation[$iterator_processors - $RANGE_START_PROCESSORS]}
+    seconds_calculation=""
+    milliseconds_calculation=""
     for (( iterator_values=1; iterator_values<${#evaluation_parts[@]}+1; iterator_values++ ))
     do
         combined_values=$(echo "$values" | cut -d";" -f"$iterator_values")
         milliseconds=$(echo "$combined_values" | cut -d"|" -f1)
         seconds=$(echo "$combined_values" | cut -d"|" -f2)
+        if [ ${evaluation_parts[$iterator_values-1]} -eq "Calculating Motion Vectors" ]
+        then
+            seconds_calculation=$seconds
+            milliseconds_calculation=$milliseconds
+        fi
+
         speed_up=""
         speed_up_string=""
         if [ "$iterator_processors" -eq $RANGE_START_PROCESSORS ] || [ -z "$iterator_processors" ]
@@ -99,7 +109,8 @@ do
         fi
         output_string="    $(printf "%-35s\n" "${evaluation_parts[$iterator_values-1]}"): $milliseconds ms (= $seconds s) $speed_up_string"
         echo "$output_string"
-        total_output+="$output_string \n"
+        extra_info="Macro Blocks per Second: $(printf "%0.3f" "$(echo "$amount_macro_blocks/$seconds_calculation" | bc -l)") | Macro Blocks per milliseconds: $(printf "%0.3f" "$(echo "$amount_macro_blocks/$milliseconds_calculation" | bc -l)")"
+        total_output+="$output_string \n $extra_info\n"
     done
 done
 
