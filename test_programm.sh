@@ -66,6 +66,7 @@ do
 done
 
 reference_times=()
+total_output=""
 for (( iterator_processors=$RANGE_START_PROCESSORS; iterator_processors<=$range_end_processors; iterator_processors++ ))
 do
     if [ "$iterator_processors" -eq "$RANGE_START_PROCESSORS" ]
@@ -76,7 +77,6 @@ do
     fi
     echo "Used times with $iterator_processors Processors"
     
-    total_output=""
     values=${list_evaluation[$iterator_processors - $RANGE_START_PROCESSORS]}
     for (( iterator_values=1; iterator_values<${#evaluation_parts[@]}+1; iterator_values++ ))
     do
