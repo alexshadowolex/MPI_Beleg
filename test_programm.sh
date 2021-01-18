@@ -97,7 +97,7 @@ do
 
         if [ "${evaluation_parts[$iterator_values-1]}" == "Total Program" ]
         then
-            if [ -z "$best_time" || $best_time -gt $seconds ]
+            if [ -z "$best_time" ] || [ $best_time -gt $seconds ]
             then
                 best_time=$seconds
                 best_amount_processors=$iterator_processors
@@ -123,10 +123,13 @@ do
         total_output+="$output_string \n"
     done
     extra_info="    Macro Blocks per Second: $(printf "%0.3f" "$(echo "$amount_macro_blocks/$seconds_calculation" | bc -l)") | Macro Blocks per milliseconds: $(printf "%0.3f" "$(echo "$amount_macro_blocks/$milliseconds_calculation" | bc -l)")"
-    extra_info+="\n    Best time: $best_time s with $best_amount_processors processors"
     echo "$extra_info"
     total_output+=" $extra_info\n"
 done
+
+extra_info2="Best time: $best_time s with $best_amount_processors processors"
+echo "$extra_info2"
+total_output+=" $extra_info2\n"
 
 file_name="1-${range_end_processors}_${distance_vectors}"
 add_iterator=1
