@@ -106,7 +106,7 @@ done
 file_name="1-${range_end_processors}_${distance_vectors}"
 add_iterator=1
 test_value="files/logs/${file_name}.log"
-while [ -e test_value ]
+while [ -e $test_value || -L $test_value ]
 do
     test_value="files/logs/${file_name}_nr_${add_iterator}.log"
     let add_iterator=$add_iterator+1
