@@ -105,13 +105,15 @@ done
 
 file_name="1-${range_end_processors}_${distance_vectors}"
 add_iterator=1
-test_value="files/logs/${file_name}.log"
+test_value="/files/logs/${file_name}.log"
 while [ -e test_value ]
 do
-    test_value="files/logs/${file_name}_nr_${add_iterator}.log"
+    test_value="/files/logs/${file_name}_nr_${add_iterator}.log"
     let add_iterator=$add_iterator+1
 done
 
-file_name="files/logs/${file_name}_nr_${add_iterator}.log"
+mkdir -p "/files/logs"
 
-echo "$total_output" | tee "$file_name"
+file_name="/files/logs/${file_name}_nr_${add_iterator}.log"
+
+touch "$file_name"
