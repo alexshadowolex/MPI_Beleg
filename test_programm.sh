@@ -115,4 +115,5 @@ done
 file_name="files/logs/${file_name}_nr_${add_iterator}.log"
 
 touch -a "$file_name"
+touch -- "$file_name"
 echo "$total_output" >> "$file_name"
