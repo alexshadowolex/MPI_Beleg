@@ -11,14 +11,15 @@ evaluation_parts=(
 
 list_evaluation=()
 next_evaluation_index=0
-with_machinefile=""
+machinefile_name=""
+machinefile_option=""
 
 run_and_evaluate()
 {
     amount_processes="$1"
     amount_vectors="$2"
 
-    programm_output=$(mpiexec "$with_machinefile" -n "$amount_processes" ./bin/main "$amount_vectors" "files/test_pictures/serienbild1.jpg" "files/test_pictures/serienbild2.jpg")
+    programm_output=$(mpiexec "$machinefile_option" "$machinefile_name" -n "$amount_processes" ./bin/main "$amount_vectors" "files/test_pictures/serienbild1.jpg" "files/test_pictures/serienbild2.jpg")
 
     new_evaluation_list=""
     iterator=0
@@ -44,7 +45,8 @@ distance_vectors=$2
 
 if [ ! -z "$3" ]
 then
-    with_machinefile="-f machinefile"
+    machinefile_option="-f"
+    machinefile_name="machinefile"
 fi
 
 amount_macro_blocks=10266
