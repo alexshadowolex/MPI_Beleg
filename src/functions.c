@@ -365,7 +365,7 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
             send_alltoall[iterator_fill_alltoall].x_width = x_width_motion;
             send_alltoall[iterator_fill_alltoall].y_height = y_height_motion;
         }
-
+        //TODO More all to all here?
         MPI_Alltoall(send_alltoall, 1, MPI_tMacro_Block_SAD, receive_alltoall, 1, MPI_tMacro_Block_SAD, worker);
         int iterator_alltoall;
         int rank_has_best_SAD_value = 1;
