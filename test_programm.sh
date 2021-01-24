@@ -19,7 +19,7 @@ run_and_evaluate()
     amount_processes="$1"
     amount_vectors="$2"
 
-    programm_output=$(mpiexec "$machinefile_option" "$machinefile_name" -n $amount_processes ./bin/main $amount_vectors "files/test_pictures/serienbild1.jpg" "files/test_pictures/serienbild2.jpg")
+    programm_output=$(mpiexec"$machinefile_option""$machinefile_name" -n $amount_processes ./bin/main $amount_vectors "files/test_pictures/serienbild1.jpg" "files/test_pictures/serienbild2.jpg")
 
     new_evaluation_list=""
     iterator=0
@@ -45,8 +45,8 @@ distance_vectors=$2
 
 if [ ! -z "$3" ]
 then
-    machinefile_option="-f"
-    machinefile_name="machinefile"
+    machinefile_option=" -f"
+    machinefile_name=" machinefile"
 fi
 
 
