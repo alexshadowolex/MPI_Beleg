@@ -111,11 +111,7 @@ int main(int argc, char ** argv){
 
     time_printf(("Finished freeing all maloced data\n"));
 
-    time_printf(("Time used for Other : 3.007 ms (=0.003 s)\n"));
-
     time_printf(("Finished running the program!\n"));
-
-    time_printf(("Time used for Programm : 1.667 ms (=0.001 s)\n"));
 
     exit(EXIT_SUCCESS);
 }
