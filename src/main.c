@@ -280,7 +280,9 @@ int main(int argc, char ** argv){
             time_printf(("Time used for %-30s: %0.3f ms (= %0.3f s)\n", tmp->evaluation_for, tmp->time_difference, (tmp->time_difference / 1000) ));
         }
     }
-    delete_list(time_evaluation_list);
+    if(rank == MASTER_RANK){
+        delete_list(time_evaluation_list);
+    }
     
     MPI_Finalize();
 
