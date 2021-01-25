@@ -274,12 +274,12 @@ int main(int argc, char ** argv){
 
     int iterator_time_evaluation;
     // Evaluate the used time
-    // if(rank == MASTER_RANK){
-    //     for(iterator_time_evaluation = 0; iterator_time_evaluation < time_evaluation_list->size; iterator_time_evaluation++){
-    //         tTime_evaluation * tmp = (tTime_evaluation *) get_element(time_evaluation_list, iterator_time_evaluation)->item;
-    //         time_printf(("Time used for %-30s: %0.3f ms (= %0.3f s)\n", tmp->evaluation_for, tmp->time_difference, (tmp->time_difference / 1000) ));
-    //     }
-    // }
+    if(rank == MASTER_RANK){
+        for(iterator_time_evaluation = 0; iterator_time_evaluation < time_evaluation_list->size - 1; iterator_time_evaluation++){
+            tTime_evaluation * tmp = (tTime_evaluation *) get_element(time_evaluation_list, iterator_time_evaluation)->item;
+            time_printf(("Time used for %-30s: %0.3f ms (= %0.3f s)\n", tmp->evaluation_for, tmp->time_difference, (tmp->time_difference / 1000) ));
+        }
+    }
     if(rank == MASTER_RANK){
         delete_list(time_evaluation_list);
     }
