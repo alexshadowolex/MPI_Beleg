@@ -2,7 +2,14 @@
 Project for my parallel systems module
 
 ## Info
-Before running the program, make sure the lib-folder exists with the fitting files (folder is **NOT** included in the repository). 
+Before running the program, make sure the lib-folder exists with the fitting files (folder is **NOT** included in the repository). You also need to install mpi on your device. 
+<br>
+Before running anything, start with following commands:
+```
+chmod +x prepare_scripts.sh
+dos2unix prepare_scripts.sh
+prepare_scripts.sh
+```
 <br><br>
 
 ## Compile
@@ -29,19 +36,24 @@ Compiling is possible with more options. Giving "DEBUG" and another argument (e.
 ## Run
 Run with<br>
 ```
-./bin/main <amount_processes> <distanze_motion_vector_seatch> <picture1> <picture2>
+mpiexec -f machinefile -n <amount_processes> ./bin/main <distanze_motion_vector_search> <picture1> <picture2>
 ```
 Run with test-files<br>
 ```
-./bin/main <amount_processes> 5 files/test_pictures/paint1.jpg files/test_pictures/paint2.jpg
+mpiexec -f machinefile -n <amount_processes> ./bin/main 5 files/test_pictures/paint1.jpg files/test_pictures/paint2.jpg
 ```
 or use (giving no picture args uses the test pictures)<br>
 ```
-./run.sh <amount_processes> <distanze_motion_vector_seatch> <picture1> <picture2>
+./run.sh <amount_processes> <distanze_motion_vector_search> <picture1> <picture2>
 ```
 <br>
 Note that the argument "amount_processes" will only be used for running the mpiexec-command and is not an argument of the programm.
 
+## Test
+The script test_programm.sh runs the programm several times with the same amount of motion-vectors, but different amount of processors. Run it with<br>
+```
+./test_programm.sh <amount_processes> <distanze_motion_vector_search>
+```
 
 ## Command line args
 * arg 1: Defines the distance around each macro-block, in which the possible motion vector could be. Note that it will take more time, the bigger the number is. Only give int-values!
