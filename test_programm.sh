@@ -19,6 +19,7 @@ run_and_evaluate()
     amount_processes="$1"
     amount_vectors="$2"
 
+    echo "Line is: mpiexec"$machinefile_option""$machinefile_name" -n "$amount_processes" ./bin/main "$amount_vectors" files/test_pictures/serienbild1.jpg files/test_pictures/serienbild2.jpg"
     programm_output=$(mpiexec"$machinefile_option""$machinefile_name" -n "$amount_processes" ./bin/main "$amount_vectors" "files/test_pictures/serienbild1.jpg" "files/test_pictures/serienbild2.jpg")
 
     new_evaluation_list=""
