@@ -135,6 +135,7 @@ do
                 #speed_up="$(printf "%0.3f\n" "$(echo "((${reference_times[$iterator_values-1]}-$milliseconds)*100)/${reference_times[$iterator_values-1]}" | bc -l)")"
                 speed_up="$(printf "%0.3f\n" "$(echo "$milliseconds/${reference_times[$iterator_values-1]}" | bc -l)")"
             fi
+            #speed_up_string="====> Speed up: $speed_up%"
             speed_up_string="====> Speed up: $speed_up"
         fi
         output_string="    $(printf "%-35s\n" "${evaluation_parts[$iterator_values-1]}"): $milliseconds ms (= $seconds s) $speed_up_string"
