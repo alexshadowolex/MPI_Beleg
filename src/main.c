@@ -19,7 +19,8 @@ int main(int argc, char ** argv){
 
     // Some sanity checks
     if(argc <= 3){
-        time_printf(("Not enough args! Usage: %s <distanze_motion_vector_search> <ref_picture> <picture 1> (optional: more picturesult)\n", argv[0]));
+        print_timestamp(); 
+        printf("Not enough args! Usage: %s <distanze_motion_vector_search> <ref_picture> <picture 1> (optional: more picturesult)\n", argv[0]);
         MPI_Abort(MPI_COMM_WORLD ,EXIT_FAILURE);
     }
 
@@ -27,7 +28,8 @@ int main(int argc, char ** argv){
     int distanze_motion_vector_search = atoi(argv[1]);
 
     if(distanze_motion_vector_search < 0){
-        time_printf(("Given distance for the motion vector search %i is not >= 0. Please provide a value greater or equal zero\n", distanze_motion_vector_search));
+        print_timestamp(); 
+        printf("Given distance for the motion vector search %i is not >= 0. Please provide a value greater or equal zero\n", distanze_motion_vector_search);
         MPI_Abort(MPI_COMM_WORLD ,EXIT_FAILURE);
     }
 
