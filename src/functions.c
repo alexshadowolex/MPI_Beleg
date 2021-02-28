@@ -65,7 +65,9 @@ tFile_data * read_picture(char * file_name){
     if (data){ 
         free(data);
     } else {
-        time_printf(("Failed loading data of picture %s\n", file_name));
+        print_timestamp();
+        printf("Failed loading data of picture %s\n", file_name);
+        MPI_Abort(MPI_COMM_WORLD ,EXIT_FAILURE);
     }
 
     // load image once again and check whether the same values are obtained 
@@ -84,7 +86,9 @@ tFile_data * read_picture(char * file_name){
         tmp->height = height; 
         tmp->width = width;
     } else {
-        time_printf(("Failed loading data on second try, picture %s\n", file_name));
+        print_timestamp();
+        printf("Failed loading data on second try, picture %s\n", file_name);
+        MPI_Abort(MPI_COMM_WORLD ,EXIT_FAILURE);
     }
     return tmp;
 }
@@ -92,9 +96,7 @@ tFile_data * read_picture(char * file_name){
 // Simulate 2D-access onto the data-array and transform it into 1D-access
 tPixel_data access_file_data_array(tFile_data * file, int x_width, int y_height){
     int access_index = y_height * file->width * 4 + x_width * 4;
-#ifdef TEST_ACCESS
-    xprintf(("access_index = %i\n", access_index));
-#endif
+    
     tPixel_data ret_value = {
         '\0',
         '\0',
@@ -264,9 +266,6 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
     int amount_macro_blocks = get_amount_macro_blocks(ref_picture);
     int current_macro_block, current_x_width_motion, current_y_height_motion, x_current_width_macro_block, y_current_height_macro_block;
 
-#ifdef TEST_SAD_CALC
-    xprintf(("Distance motion vector: %i\n", distanze_motion_vector_search));
-#endif
     for(current_macro_block = 0; 
         current_macro_block < amount_macro_blocks; 
         current_macro_block++){
@@ -341,13 +340,8 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
             }
 
             // Save the lowest sad Value and the fitting motion vector
-#ifdef TEST_SAD_CALC
-                xprintf(("Found new minimal SAD: %f\n", current_values.value_SAD));
-#endif
         }
-#ifdef TEST_SAD_CALC
-        printf("Current macro block: %i\nMotion Vector: x_width = %i, y_height = %i\nSAD-value: %f\n", current_macro_block, x_width_motion, y_height_motion, minimal_SAD);
-#endif
+        
         // Add vector for macro block here
         tMacro_Block_SAD * macro_block_SAD = malloc(sizeof(tMacro_Block_SAD));
 
