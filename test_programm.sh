@@ -99,7 +99,7 @@ do
         seconds=$(echo "$combined_values" | cut -d"|" -f2)
         if [ "${evaluation_parts[$iterator_values-1]}" == "Calculating Motion Vectors" ]
         then
-            if [ 1 -eq "$(echo "$seconds == 0" | bc -l)" ]
+            if [ 1 -eq "$(echo "$seconds == 0" | bc -l)" ] # Test comment
             then
                 seconds_calculation=100
             else
