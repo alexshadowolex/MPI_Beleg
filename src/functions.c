@@ -64,7 +64,9 @@ tFile_data * read_picture(char * file_name){
     if (data){ 
         free(data);
     } else {
-        time_printf(("Failed loading data of picture %s\n", file_name));
+        print_timestamp();
+        printf("Failed loading data of picture %s\n", file_name);
+        MPI_Abort(MPI_COMM_WORLD ,EXIT_FAILURE);
     }
 
     // load image once again and check whether the same values are obtained 
@@ -83,7 +85,9 @@ tFile_data * read_picture(char * file_name){
         tmp->height = height; 
         tmp->width = width;
     } else {
-        time_printf(("Failed loading data on second try, picture %s\n", file_name));
+        print_timestamp();
+        printf("Failed loading data on second try, picture %s\n", file_name);
+        MPI_Abort(MPI_COMM_WORLD ,EXIT_FAILURE);
     }
     return tmp;
 }
