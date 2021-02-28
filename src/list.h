@@ -1,5 +1,4 @@
-typedef struct sFile_data tFile_data;
-
+// Simple stack list for holding data
 typedef struct sList_Element{
     struct sList_Element * next_element;
     void                 * item;

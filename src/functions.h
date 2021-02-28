@@ -75,8 +75,10 @@ void end_programm(tList * file_data_list, tList * list_compared_pictures);
 #define SIZE_MACRO_BLOCK 16
 #define MASTER_RANK 0
 
-#define time_printf(x) if(rank == 0){print_timestamp(); printf x;}
+// Prints will only be executed when the master rank calls them
+#define time_printf(x) if(rank == MASTER_RANK){print_timestamp(); printf x;}
 
+// Debug prints
 #ifdef DEBUG
 #define xprintf(x) time_printf(x)
 #else

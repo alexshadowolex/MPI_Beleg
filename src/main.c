@@ -9,6 +9,7 @@
 
 int main(int argc, char ** argv){
 
+    // Take time for the whole programm
     struct timeval total_end_time, total_start_time;
     gettimeofday(&total_start_time, NULL);
 
@@ -16,6 +17,7 @@ int main(int argc, char ** argv){
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &amount_processes);
 
+    // Some sanity checks
     if(argc <= 3){
         time_printf(("Not enough args! Usage: %s <distanze_motion_vector_search> <ref_picture> <picture 1> (optional: more picturesult)\n", argv[0]));
         MPI_Abort(MPI_COMM_WORLD ,EXIT_FAILURE);
@@ -29,6 +31,7 @@ int main(int argc, char ** argv){
         MPI_Abort(MPI_COMM_WORLD ,EXIT_FAILURE);
     }
 
+    // Split ranks into master group and worker group
     MPI_Comm_split(MPI_COMM_WORLD, (rank == 0), rank, &worker);
 
     // Initilize all used MPI_Datatypes
@@ -99,6 +102,7 @@ int main(int argc, char ** argv){
     } else {
         // If there are at least 2 processes, the process with rank equal MASTER_RANK will collect and compare the data from all other ranks
         if(rank == MASTER_RANK ){
+            // MASTER tasks: only receive and save data
             int iterator_files;
             // Iterate over all files
             for(iterator_files = 1; iterator_files < amount_files; iterator_files++){
@@ -128,6 +132,7 @@ int main(int argc, char ** argv){
                 append_element(list_compared_pictures, tmp_macro_block_list);
             }
         } else {
+            // WORKER Tasks: calculate values and only send them, if they are the best ones
             int iterator_files;
             // Iterate over all files
             for(iterator_files = 1; iterator_files < amount_files; iterator_files++){
@@ -142,7 +147,7 @@ int main(int argc, char ** argv){
                     range[1]
                 );
                 int iterator_macro_block;
-                // Send each macro-block's SAD value and motion vector to master, so he can compare all of them
+                // Send values to Master, when the current rank has the best ones
                 for(iterator_macro_block = 0; iterator_macro_block < tmp_list->size; iterator_macro_block++){
                     tTMP_Macro_Block_SAD buffer;
                     tMacro_Block_SAD * tmp = (tMacro_Block_SAD *) get_element(tmp_list, iterator_macro_block)->item;
@@ -223,6 +228,7 @@ int main(int argc, char ** argv){
 
     int ret_value = EXIT_SUCCESS;
     if(rank == MASTER_RANK){
+        // Master encodes the files
         ret_value = encode_files(file_data_list, list_compared_pictures);
     }
 
@@ -246,6 +252,7 @@ int main(int argc, char ** argv){
     gettimeofday(&ending_start_time, NULL);
 
     if(rank == MASTER_RANK){
+        // only Master deletes all lists to avoid segmentation faults
         end_programm(file_data_list, list_compared_pictures);
     }
 

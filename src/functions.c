@@ -15,14 +15,7 @@
 #define STB_DEFINE
 #include "../lib/stb/stb.h"
 
-// #define PNGSUITE_PRIMARY
 #define TERM_OUTPUT
-
-
-// #define X11_DISPLAY
-
-
-// Globally used vars
 
 
 // Print a timestamp for Output
@@ -47,7 +40,7 @@ void print_timestamp(void){
     printf("%s.%03d ", buffer, millisec);
 }
 
-// Initialize datatypes used for mpi_send
+// Initialize datatype(s) used for mpi_send
 void init_mpi_data_types(void){
     int macro_block_SAD_lenghts[3] = {1, 1, 1};
     MPI_Aint macro_block_SAD_displacements[3] = {0, sizeof(float), sizeof(float) + sizeof(int)};
@@ -111,6 +104,7 @@ tPixel_data access_file_data_array(tFile_data * file, int x_width, int y_height)
     if(y_height >= file->height || x_width >= file->width || y_height < 0 || x_width < 0){
         ret_value.initialized_correct = 0;
     } else {
+        // Else set it to the fitting values and set the flag to true
         ret_value.red = (unsigned char) file->data[access_index + 0];
         ret_value.green = (unsigned char) file->data[access_index + 1];
         ret_value.blue = (unsigned char) file->data[access_index + 2];
@@ -119,11 +113,6 @@ tPixel_data access_file_data_array(tFile_data * file, int x_width, int y_height)
     return ret_value;
 }
 
-// Return the amount of macro blocks in a picture
-int get_amount_macro_blocks(tFile_data * ref_picture){
-    // Since every picture has an integer amount of macro blocks, the calculation is easy
-    return (ref_picture->height / SIZE_MACRO_BLOCK) * (ref_picture->width / SIZE_MACRO_BLOCK);
-}
 
 // ===================SAD Functions===================
 /* Macro blocks are counted like this:
@@ -157,9 +146,17 @@ int get_amount_motion_vectors(int distance_motion_vector){
     return ((distance_motion_vector * 2) + 1) * ((distance_motion_vector * 2) + 1);
 }
 
-// Calculate the range of motion vectors to check for each rank
+// Return the amount of macro blocks in a picture
+int get_amount_macro_blocks(tFile_data * ref_picture){
+    // Since every picture has an integer amount of macro blocks, the calculation is easy
+    return (ref_picture->height / SIZE_MACRO_BLOCK) * (ref_picture->width / SIZE_MACRO_BLOCK);
+}
+
+// Calculate the range of motion vectors to check for each rank (relevant with more than 3 ranks)
 void get_range(int range[], int amount_motion_vectors){
     int amount_working_processes = amount_processes - 1;
+
+    // function will not get called, when there is only one rank, so this is the special case
     if(amount_working_processes == 0){
         range[0] = 0;
         range[1] = amount_motion_vectors;
@@ -170,6 +167,7 @@ void get_range(int range[], int amount_motion_vectors){
         } else {
             range[1] = (amount_motion_vectors / amount_working_processes) * (rank);
         }
+        
         // Caclulate the rest of motion vectors, which are all left for the last rank
         int rest = amount_motion_vectors % amount_working_processes;
         int working_rank = rank - 1;
@@ -259,7 +257,7 @@ tPixel_index get_next_motion_vector(int iteration){
     return ret_vector;
 }
 
-// Calculates the SAD values for all possible motion vectors for all macro blocks
+// Calculates the SAD values for all possible motion vectors for all macro blocks. This is the function that takes most of the programm's execution time
 tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, int distanze_motion_vector_search, int range_start, int range_end){
     // The list holds for all macro blocks the best motion vector in a struct tMacro_Block_SAD
     tList * all_macro_block_SAD = create_list();
@@ -287,6 +285,7 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
 
         // get_next_motion_vector will return values for the iteration
         // amount_motion_vectors is the amount of motion vectors that have to get tested
+        // only check vectors inside the fitting range
         for(current_motion_vector_iteration = range_start; 
             current_motion_vector_iteration < range_end && !found_minimal_SAD; 
             current_motion_vector_iteration++){
@@ -366,6 +365,7 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
             send_alltoall[iterator_fill_alltoall].y_height = y_height_motion;
         }
 
+        // Communicate best value to all worker ranks and check with received values, if it is the best one
         MPI_Alltoall(send_alltoall, 1, MPI_tMacro_Block_SAD, receive_alltoall, 1, MPI_tMacro_Block_SAD, worker);
         int iterator_alltoall;
         int rank_has_best_SAD_value = 1;
@@ -386,6 +386,7 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
             }
         }
 
+        // If the rank has the best value for the macro block, append the values to the list. If not, only NULL will get added
         if(rank_has_best_SAD_value){
             tPixel_index motion_vector = {x_width_motion, y_height_motion};
             
