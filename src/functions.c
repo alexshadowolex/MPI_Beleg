@@ -264,10 +264,8 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
     int amount_macro_blocks = get_amount_macro_blocks(ref_picture);
     int current_macro_block, current_x_width_motion, current_y_height_motion, x_current_width_macro_block, y_current_height_macro_block;
 
-    int amount_motion_vectors = get_amount_motion_vectors(distanze_motion_vector_search);
 #ifdef TEST_SAD_CALC
     xprintf(("Distance motion vector: %i\n", distanze_motion_vector_search));
-    xprintf(("Amount motion vectors: %i\n", amount_motion_vectors));
 #endif
     for(current_macro_block = 0; 
         current_macro_block < amount_macro_blocks; 
@@ -284,7 +282,6 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
         int found_minimal_SAD = 0;
 
         // get_next_motion_vector will return values for the iteration
-        // amount_motion_vectors is the amount of motion vectors that have to get tested
         // only check vectors inside the fitting range
         for(current_motion_vector_iteration = range_start; 
             current_motion_vector_iteration < range_end && !found_minimal_SAD; 
@@ -294,6 +291,8 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
 
             int current_x_width_motion = next_motion_vector.x_width;
             int current_y_height_motion = next_motion_vector.y_height;
+            (void) current_x_width_motion; // Avoid -Wall warning
+            (void) current_y_height_motion;
             float current_SAD = 0;
             int exceeded_minimal_sad = 0;
             // Calculate minimal SAD and save the value and the fitting distance motion vector
