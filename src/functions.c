@@ -15,15 +15,7 @@
 #define STB_DEFINE
 #include "../lib/stb/stb.h"
 
-// #define PNGSUITE_PRIMARY
 #define TERM_OUTPUT
-
-
-// #define X11_DISPLAY
-
-
-// Globally used vars
-
 
 // Print a timestamp for Output
 void print_timestamp(void){
@@ -111,18 +103,13 @@ tPixel_data access_file_data_array(tFile_data * file, int x_width, int y_height)
     if(y_height >= file->height || x_width >= file->width || y_height < 0 || x_width < 0){
         ret_value.initialized_correct = 0;
     } else {
+        // if not, set the fitting data and the flag on true
         ret_value.red = (unsigned char) file->data[access_index + 0];
         ret_value.green = (unsigned char) file->data[access_index + 1];
         ret_value.blue = (unsigned char) file->data[access_index + 2];
         ret_value.initialized_correct = 1;
     }
     return ret_value;
-}
-
-// Return the amount of macro blocks in a picture
-int get_amount_macro_blocks(tFile_data * ref_picture){
-    // Since every picture has an integer amount of macro blocks, the calculation is easy
-    return (ref_picture->height / SIZE_MACRO_BLOCK) * (ref_picture->width / SIZE_MACRO_BLOCK);
 }
 
 // ===================SAD Functions===================
@@ -154,6 +141,12 @@ int get_amount_motion_vectors(int distance_motion_vector){
         return -1;
     }
     return ((distance_motion_vector * 2) + 1) * ((distance_motion_vector * 2) + 1);
+}
+
+// Return the amount of macro blocks in a picture
+int get_amount_macro_blocks(tFile_data * ref_picture){
+    // Since every picture has an integer amount of macro blocks, the calculation is easy
+    return (ref_picture->height / SIZE_MACRO_BLOCK) * (ref_picture->width / SIZE_MACRO_BLOCK);
 }
 
 // Calculate the range of motion vectors to check for each rank
@@ -260,16 +253,14 @@ tPixel_index get_next_motion_vector(int iteration){
 }
 
 // Calculates the SAD values for all possible motion vectors for all macro blocks
+// This function takes the most time of the total execution
 tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, int distanze_motion_vector_search, int range_start, int range_end){
     // The list holds for all macro blocks the best motion vector in a struct tMacro_Block_SAD
     tList * all_macro_block_SAD = create_list();
     int amount_macro_blocks = get_amount_macro_blocks(ref_picture);
     int current_macro_block, current_x_width_motion, current_y_height_motion, x_current_width_macro_block, y_current_height_macro_block;
-    // for the distance 1, the amount is 9, for 2 it's 25 etc.
-    int amount_motion_vectors = get_amount_motion_vectors(distanze_motion_vector_search);
 #ifdef TEST_SAD_CALC
     xprintf(("Distance motion vector: %i\n", distanze_motion_vector_search));
-    xprintf(("Amount motion vectors: %i\n", amount_motion_vectors));
 #endif
     for(current_macro_block = 0; 
         current_macro_block < amount_macro_blocks; 
@@ -284,7 +275,7 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
         int current_motion_vector_iteration;
         int found_minimal_SAD = 0;
         // get_next_motion_vector will return values for the iteration
-        // amount_motion_vectors is the amount of motion vectors that have to get tested
+        // only check the motion vectors inside range
         for(current_motion_vector_iteration = range_start; 
             current_motion_vector_iteration < range_end && !found_minimal_SAD; 
             current_motion_vector_iteration++){

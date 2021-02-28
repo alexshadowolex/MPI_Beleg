@@ -9,6 +9,7 @@
 
 int main(int argc, char ** argv){
 
+    // Take time for the whole program execution
     struct timeval total_end_time, total_start_time;
     gettimeofday(&total_start_time, NULL);
 
@@ -16,13 +17,10 @@ int main(int argc, char ** argv){
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &amount_processes);
 
-    // char processor_name[MPI_MAX_PROCESSOR_NAME];
-    // int name_len;
-    // MPI_Get_processor_name(processor_name, &name_len);
-    // printf("Processor name: %s\n", processor_name);
-
+    // Some sanity checks
     if(argc <= 3){
-        time_printf(("Not enough args! Usage: %s <distanze_motion_vector_search> <ref_picture> <picture 1> (optional: more picturesult)\n", argv[0]));
+        print_timestamp();
+        printf("Not enough args! Usage: %s <distanze_motion_vector_search> <ref_picture> <picture 1> (optional: more picturesult)\n", argv[0]);
         MPI_Abort(MPI_COMM_WORLD ,EXIT_FAILURE);
     }
 
@@ -30,7 +28,8 @@ int main(int argc, char ** argv){
     int distanze_motion_vector_search = atoi(argv[1]);
 
     if(distanze_motion_vector_search < 0){
-        time_printf(("Given distance for the motion vector search %i is not >= 0. Please provide a value greater or equal zero\n", distanze_motion_vector_search));
+        print_timestamp();
+        printf("Given distance for the motion vector search %i is not >= 0. Please provide a value greater or equal zero\n", distanze_motion_vector_search);
         MPI_Abort(MPI_COMM_WORLD ,EXIT_FAILURE);
     }
 
@@ -103,6 +102,7 @@ int main(int argc, char ** argv){
     } else {
         // If there are at least 2 processes, the process with rank equal MASTER_RANK will collect and compare the data from all other ranks
         if(rank == MASTER_RANK ){
+            // MASTER Tasks: Receive all values from each worker and evaluate and save them
             int iterator_files;
             // Iterate over all files
             for(iterator_files = 1; iterator_files < amount_files; iterator_files++){
@@ -136,8 +136,6 @@ int main(int argc, char ** argv){
                         gettimeofday(&calc_send_end_time, NULL);
                         time_for_calculation += calculate_time_difference(calc_send_start_time, calc_send_end_time);
 
-                        //TODO mpi_all_to_all zum austauschen des minimalen SAD wertes
-
                         // Evaluatue like in calc_SAD_values
                         if(buffer.value_SAD < current_minimal_SAD){
                             current_minimal_SAD = buffer.value_SAD;
@@ -160,6 +158,7 @@ int main(int argc, char ** argv){
                 append_element(list_compared_pictures, tmp_macro_block_list);
             }
         } else {
+            // WORKER Tasks: send all found values to Master
             int iterator_files;
             // Iterate over all files
             for(iterator_files = 1; iterator_files < amount_files; iterator_files++){
@@ -194,7 +193,7 @@ int main(int argc, char ** argv){
 
     if(amount_processes > 1){    
         add_to_evaluation_list("Calculating Motion Vectors and Sending only", calc_start_time, calc_end_time, time_for_calculation);
-        add_to_evaluation_list("Evaluating sended Values", calc_start_time, calc_end_time, calculate_time_difference(calc_start_time, calc_end_time) - time_for_calculation);
+        add_to_evaluation_list("Evaluating sent Values", calc_start_time, calc_end_time, calculate_time_difference(calc_start_time, calc_end_time) - time_for_calculation);
     }
 
     add_to_evaluation_list("Calculating Motion Vectors TOTAL", calc_start_time, calc_end_time, -1.0);
@@ -258,6 +257,7 @@ int main(int argc, char ** argv){
 
     int ret_value = EXIT_SUCCESS;
     if(rank == MASTER_RANK){
+        // Only the master encodes the files
         ret_value = encode_files(file_data_list, list_compared_pictures);
     }
 
@@ -281,6 +281,7 @@ int main(int argc, char ** argv){
     gettimeofday(&ending_start_time, NULL);
 
     if(rank == MASTER_RANK){
+        // Only the master free's all data
         end_programm(file_data_list, list_compared_pictures);
     }
 
