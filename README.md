@@ -30,7 +30,7 @@ or run <br>
 ./compile.sh DEBUG
 ```
 <br>
-Compiling is possible with more options. Giving "DEBUG" and another argument (e.g. TEST_MACRO_CALC) will give more Output. Check main.h for more info!
+Compiling is possible with more options. Giving "DEBUG" will give more Output. Check main.h for more info!
 <br><br>
 
 ## Run
