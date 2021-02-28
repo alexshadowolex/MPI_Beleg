@@ -200,56 +200,6 @@ int main(int argc, char ** argv){
 
     time_printf(("Finished calculating the motion vectors\n"));
 
-#ifdef TEST_SAD_CALC_OUTPUT
-    if(rank == MASTER_RANK){
-        int tmp_i;
-        for(tmp_i = 0; tmp_i < amount_files - 1; tmp_i++){
-            xprintf(("SAD values of vectors for macro blocks between %s and %s:\n", 
-                ((tFile_data *) get_element(file_data_list, 0)->item)->file_name, 
-                ((tFile_data *) get_element(file_data_list, tmp_i + 1)->item)->file_name 
-            ));
-            int j;
-            tList * tmp_output_list = (tList *) get_element(list_compared_pictures, tmp_i)->item;
-            for(j = 0; j < tmp_output_list->size; j++){
-                tMacro_Block_SAD * tmp_macro = (tMacro_Block_SAD *) get_element(tmp_output_list, j)->item;
-                xprintf(("Block: %i; Vector: %i|%i; SAD-value: %f\n", j, tmp_macro->motion_vector.x_width, tmp_macro->motion_vector.y_height, tmp_macro->value_SAD));
-                
-            }
-        }
-    }
-#endif
-
-#ifdef TEST_ACCESS
-    tPixel_data tmp;
-    tmp = access_file_data_array(((tFile_data *) get_element(file_data_list, 0)->item), 0, 0);
-    xprintf(("Returned: %i, %i, %i\n", tmp.red, tmp.green, tmp.blue));
-    tmp = access_file_data_array(((tFile_data *) get_element(file_data_list, 0)->item), 1, 0);
-    xprintf(("Returned: %i, %i, %i\n", tmp.red, tmp.green, tmp.blue));
-    tmp = access_file_data_array(((tFile_data *) get_element(file_data_list, 0)->item), 0, 1);
-    xprintf(("Returned: %i, %i, %i\n", tmp.red, tmp.green, tmp.blue));
-    tmp = access_file_data_array(((tFile_data *) get_element(file_data_list, 0)->item), 47, 0);
-    xprintf(("Returned: %i, %i, %i\n", tmp.red, tmp.green, tmp.blue));
-    tmp = access_file_data_array(((tFile_data *) get_element(file_data_list, 0)->item), 47, 48);
-    xprintf(("Returned: %i, %i, %i\n", tmp.red, tmp.green, tmp.blue));
-    tmp = access_file_data_array(((tFile_data *) get_element(file_data_list, 0)->item), 25, 25);
-    xprintf(("Returned: %i, %i, %i\n", tmp.red, tmp.green, tmp.blue));
-#endif
-
-#ifdef TEST_MACRO_CALC
-    for(i = 0; i < amount_files; i++){
-        tFile_data * tmp = (tFile_data *) get_element(file_data_list, i)->item;
-        int amount_macro_blocks = get_amount_macro_blocks(tmp);
-        xprintf(("Amount macro blocks %s: %i\n", tmp->file_name, amount_macro_blocks));
-
-        int j;
-        for(j = 0; j < amount_macro_blocks; j++){
-            int index[2];
-            get_macro_block_begin(tmp, j, index);
-            xprintf(("Begin macro block %i: width = %i, height = %i\n", j, index[0], index[1]));
-        }
-    }
-#endif
-
     time_printf(("Starting to encode all files\n"));
 
     struct timeval encode_start_time, encode_end_time;
