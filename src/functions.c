@@ -291,8 +291,6 @@ tList * calc_SAD_values(tFile_data * ref_picture, tFile_data * other_picture, in
 
             int current_x_width_motion = next_motion_vector.x_width;
             int current_y_height_motion = next_motion_vector.y_height;
-            (void) current_x_width_motion; // Avoid -Wall warning
-            (void) current_y_height_motion;
             float current_SAD = 0;
             int exceeded_minimal_sad = 0;
             // Calculate minimal SAD and save the value and the fitting distance motion vector
